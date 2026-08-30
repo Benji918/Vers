@@ -101,6 +101,11 @@ def _split_segments(text: str) -> list[str]:
     """
     Split a continuous transcript into clause/sentence-sized segments so the
     matcher can identify multiple verses inside a long passage.
+
+    Deepgram can deliver a long passage as one single run (no periods),
+    so beyond splitting on explicit punctuation we also break long runs into
+    overlapping verse-sized windows. Overlapping windows ensure whichever
+    window contains a given verse can still match it.
     """
     if not text:
         return []
@@ -115,13 +120,27 @@ def _split_segments(text: str) -> list[str]:
         if not part:
             continue
 
-        if len(part.split()) > 14:
-            for sub in re.split(r'[,:]\s+', part):
-                sub = sub.strip()
-                if sub and len(sub.split()) >= MIN_SEGMENT_WORDS:
-                    segments.append(sub)
-        else:
+        words = part.split()
+        if len(words) <= 14:
             segments.append(part)
+            continue
+
+        clauses = [c.strip() for c in re.split(r'[,:]\s+', part) if c.strip()]
+        if clauses and len(clauses) > 1 and all(len(c.split()) <= 20 for c in clauses):
+            for c in clauses:
+                if len(c.split()) >= MIN_SEGMENT_WORDS:
+                    segments.append(c)
+            continue
+
+        window = 18
+        step = 11
+        for i in range(0, max(1, len(words) - step + 1), step):
+            chunk = " ".join(words[i:i + window])
+            if len(chunk.split()) >= MIN_SEGMENT_WORDS:
+                segments.append(chunk)
+        tail = " ".join(words[-window:])
+        if tail not in segments and len(tail.split()) >= MIN_SEGMENT_WORDS:
+            segments.append(tail)
 
     long = [s for s in segments if len(s.split()) >= MIN_SEGMENT_WORDS]
     return long if long else [text]

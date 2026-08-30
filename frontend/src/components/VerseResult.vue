@@ -19,9 +19,7 @@
     <!-- The Scripture Quotation(s) -->
     <div class="verse-body">
       <div v-for="(v, idx) in verseList" :key="`${v.chapter}:${v.verse}`" class="verse-block">
-        <span class="quote-mark left-quote">“</span>
-        <p class="verse-text">{{ v.text }}</p>
-        <span class="quote-mark right-quote">”</span>
+        <p class="verse-text"><span class="quote-mark left-quote">&ldquo;</span>{{ v.text }}<span class="quote-mark right-quote">&rdquo;</span></p>
         <span v-if="verseList.length > 1" class="verse-num-label">
           {{ verse.book }} {{ v.chapter }}:{{ v.verse }}
         </span>
@@ -288,22 +286,20 @@ function speakVerseText() {
 
 .quote-mark {
   font-family: var(--font-heading);
-  font-size: 3rem;
-  line-height: 0;
-  color: rgba(26, 26, 26, 0.18);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: rgba(26, 26, 26, 0.35);
   user-select: none;
+  vertical-align: text-top;
 }
 
 .left-quote {
-  position: absolute;
-  top: 0.5rem;
-  left: -0.75rem;
+  margin-right: 0.15rem;
 }
 
 .right-quote {
-  display: inline-block;
-  vertical-align: sub;
-  margin-left: 0.25rem;
+  margin-left: 0.15rem;
+  vertical-align: text-bottom;
 }
 
 .verse-text {
