@@ -43,8 +43,6 @@ vers/
 │   ├── app/
 │   │   ├── main.py                # FastAPI app entrypoint
 │   │   ├── websocket.py           # /ws/listen handler (frontend <-> backend <-> Deepgram)
-│   │   ├── models/
-│   │   │   └── verse.py           # Tortoise ORM model for Bible verses
 │   │   ├── services/
 │   │   │   ├── deepgram_client.py # Manages Deepgram streaming connection
 │   │   │   └── verse_matcher.py   # FTS + fuzzy matching logic
@@ -101,17 +99,6 @@ npm run dev
 
 ## Database Schema
 
-**`verses` table**
-
-| Column | Type | Notes |
-|---|---|---|
-| `id` | integer, PK | |
-| `book` | text | e.g. "John" |
-| `book_order` | integer | for canonical sorting |
-| `chapter` | integer | |
-| `verse` | integer | |
-| `text` | text | full verse text, indexed for FTS + trigram search |
-| `version` | text | e.g. "KJV", "NIV" |
 
 ## API / WebSocket Reference
 
