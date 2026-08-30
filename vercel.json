@@ -1,17 +1,26 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "backend/app/main.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": "backend/**"
+      }
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/backend/app/main.py"
+      "destination": "backend/app/main.py"
     },
     {
       "source": "/ws/:path*",
-      "destination": "/backend/app/main.py"
+      "destination": "backend/app/main.py"
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "destination": "frontend/$1"
     }
   ],
   "redirects": [
