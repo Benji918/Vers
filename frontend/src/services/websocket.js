@@ -28,6 +28,7 @@ export class AudioWebSocketService {
     this.analyser = null
     this.processorNode = null
     this._silentGain = null
+    this.accumulatedText = ''
     this.isListening = false
     this.onStatusChange = options.onStatusChange || (() => {})
     this.onTranscript = options.onTranscript || (() => {})
@@ -41,6 +42,7 @@ export class AudioWebSocketService {
     if (this.isListening) return
 
     this.isListening = true
+    this.accumulatedText = ''
     this.onStatusChange({ state: 'listening', message: 'Listening... speak your verse now' })
     this._simulateAudioLevel()
 
@@ -94,6 +96,7 @@ export class AudioWebSocketService {
         try {
           const data = JSON.parse(event.data)
           if (data.type === 'transcript') {
+            this._accumulateTranscript(data.text, data.is_final)
             this.onTranscript(data.text, data.is_final)
           } else if (data.type === 'match') {
             this.onVerseMatch(data)
@@ -156,6 +159,57 @@ export class AudioWebSocketService {
     } else {
       send()
     }
+  }
+
+  _accumulateTranscript(text, isFinal) {
+    if (!text || !isFinal) return
+    const cleaned = text.trim()
+    if (!cleaned) return
+
+    if (!this.accumulatedText) {
+      this.accumulatedText = cleaned
+      return
+    }
+
+    const current = this.accumulatedText.replace(/\s+$/, '')
+
+    // Case 1: within-utterance cumulative growth — new text starts with what we have.
+    if (cleaned.startsWith(current)) {
+      this.accumulatedText = cleaned
+      return
+    }
+
+    // Case 2: cross-utterance, the tail of current repeats at the head of cleaned.
+    const overlap = this._overlapWords(current, cleaned)
+    if (overlap >= 2) {
+      const tail = cleaned.split(' ').slice(overlap).join(' ')
+      this.accumulatedText = tail ? `${current} ${tail}` : current
+      return
+    }
+
+    // Case 3: distinct chunks, just concatenate.
+    this.accumulatedText = `${current} ${cleaned}`
+  }
+
+  _overlapWords(current, next) {
+    const a = current.split(' ')
+    const b = next.split(' ')
+    let overlap = 0
+    const max = Math.min(a.length, b.length)
+    for (let len = max; len >= 1; len--) {
+      if (a.slice(-len).join(' ') === b.slice(0, len).join(' ')) {
+        overlap = len
+        break
+      }
+    }
+    return overlap
+  }
+
+  finalize() {
+    const text = this.accumulatedText.trim()
+    if (!text) return
+    this._stopCapture()
+    this.sendTextQuery(text)
   }
 
   _trackAudioLevel() {
@@ -224,8 +278,7 @@ export class AudioWebSocketService {
     update()
   }
 
-  stopListening() {
-    this.isListening = false
+  _stopCapture() {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId)
       this.animationFrameId = null
@@ -255,6 +308,13 @@ export class AudioWebSocketService {
       this.audioContext.close().catch(() => {})
       this.audioContext = null
     }
+    this.analyser = null
+  }
+
+  stopListening() {
+    this.isListening = false
+    this.accumulatedText = ''
+    this._stopCapture()
 
     if (this.socket) {
       try {

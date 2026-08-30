@@ -2,7 +2,7 @@ import logging
 import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.services.deepgram_client import DeepgramStreamingClient
-from app.services.verse_matcher import find_verse
+from app.services.verse_matcher import find_verses
 from app.config import DEEPGRAM_API_KEY
 
 logger = logging.getLogger("vers.ws")
@@ -19,34 +19,18 @@ async def websocket_listen(websocket: WebSocket):
     deepgram_client = DeepgramStreamingClient()
 
     async def on_deepgram_transcript(transcript: str, is_final: bool):
-        """Callback invoked on Deepgram transcript events."""
-        if not transcript:
-            return
+        """Callback invoked on Deepgram transcript events.
 
+        For live streaming we only forward transcripts to the client so the
+        user can read out long verses uninterrupted. The definitive verse
+        match is computed once the client stops and sends the full
+        accumulated text via a text_query message.
+        """
         await websocket.send_json({
             "type": "transcript",
             "text": transcript,
             "is_final": is_final
         })
-
-        if is_final:
-            matched = find_verse(transcript)
-            if matched:
-                await websocket.send_json({
-                    "type": "match",
-                    "book": matched["book"],
-                    "chapter": matched["chapter"],
-                    "verse": matched["verse"],
-                    "text": matched["text"],
-                    "confidence": matched["confidence"],
-                    "query": transcript
-                })
-            else:
-                await websocket.send_json({
-                    "type": "no_match",
-                    "query": transcript,
-                    "message": "No matching scripture found"
-                })
 
     try:
         if DEEPGRAM_API_KEY:
@@ -72,15 +56,14 @@ async def websocket_listen(websocket: WebSocket):
                     payload = json.loads(message["text"])
                     if payload.get("type") == "text_query":
                         query_text = payload.get("text", "")
-                        matched = find_verse(query_text)
+                        matched = find_verses(query_text)
                         if matched:
                             await websocket.send_json({
                                 "type": "match",
                                 "book": matched["book"],
                                 "chapter": matched["chapter"],
-                                "verse": matched["verse"],
-                                "text": matched["text"],
-                                "confidence": matched["confidence"],
+                                "verses": matched["verses"],
+                                "range": matched["range"],
                                 "query": query_text
                             })
                         else:

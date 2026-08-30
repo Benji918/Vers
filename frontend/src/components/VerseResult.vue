@@ -4,23 +4,32 @@
     <div class="card-header">
       <div class="reference-badge">
         <span class="book-name">{{ verse.book }}</span>
-        <span class="chapter-verse">{{ verse.chapter }}:{{ verse.verse }}</span>
-        <span class="version-tag">{{ verse.version || 'KJV' }}</span>
+        <span class="chapter-verse">{{ referenceLabel }}</span>
+        <span class="version-tag">{{ verse.version || 'WEB' }}</span>
       </div>
 
-      <div class="match-meta-pill" v-if="verse.confidence">
+      <div class="match-meta-pill" v-if="avgConfidence != null">
         <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        <span>{{ Math.round(verse.confidence * 100) }}% Match · Local FTS5</span>
+        <span>{{ Math.round(avgConfidence * 100) }}% Match · Local FTS5</span>
       </div>
     </div>
 
-    <!-- The Scripture Quotation Text in EB Garamond -->
+    <!-- The Scripture Quotation(s) -->
     <div class="verse-body">
-      <span class="quote-mark left-quote">“</span>
-      <p class="verse-text">{{ verse.text }}</p>
-      <span class="quote-mark right-quote">”</span>
+      <div v-for="(v, idx) in verseList" :key="`${v.chapter}:${v.verse}`" class="verse-block">
+        <span class="quote-mark left-quote">“</span>
+        <p class="verse-text">{{ v.text }}</p>
+        <span class="quote-mark right-quote">”</span>
+        <span v-if="verseList.length > 1" class="verse-num-label">
+          {{ verse.book }} {{ v.chapter }}:{{ v.verse }}
+        </span>
+        <div class="verse-confidence" v-if="v.confidence != null">
+          <span class="conf-label">match confidence</span>
+          <span class="conf-value">{{ Math.round(v.confidence * 100) }}%</span>
+        </div>
+      </div>
     </div>
 
     <!-- Interactive Action Toolbar -->
@@ -33,7 +42,7 @@
         <svg v-else viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2E7D32" stroke-width="2.5">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        <span>{{ copied ? 'Copied to Clipboard' : 'Copy Verse' }}</span>
+        <span>{{ copied ? 'Copied to Clipboard' : 'Copy Verses' }}</span>
       </button>
 
       <button class="action-btn" @click="speakVerseText" :title="'Read scripture aloud'">
@@ -53,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   verse: {
@@ -67,8 +76,43 @@ defineEmits(['dismiss'])
 const copied = ref(false)
 const isSpeaking = ref(false)
 
+const verseList = computed(() => {
+  if (Array.isArray(props.verse.verses) && props.verse.verses.length > 0) {
+    return props.verse.verses.map((v) => ({
+      ...v,
+      version: v.version || props.verse.version || 'WEB'
+    }))
+  }
+  return [{ ...props.verse }]
+})
+
+const referenceLabel = computed(() => {
+  const chapter = props.verse.chapter || (verseList.value[0] && verseList.value[0].chapter)
+  const range = props.verse.range
+  if (range && range.start !== range.end) {
+    return `${chapter}:${range.start}-${range.end}`
+  }
+  if (verseList.value.length > 1) {
+    const verses = verseList.value.map((v) => v.verse)
+    return `${chapter}:${verses.join(',')}`
+  }
+  return `${chapter}:${verseList.value[0]?.verse}`
+})
+
+const textForCopy = computed(() =>
+  verseList.value
+    .map((v) => `"${v.text}"`)
+    .join(' ')
+)
+
+const avgConfidence = computed(() => {
+  const confs = verseList.value.map((v) => v.confidence).filter((c) => c != null)
+  if (confs.length === 0) return null
+  return confs.reduce((a, b) => a + b, 0) / confs.length
+})
+
 function copyVerse() {
-  const fullText = `"${props.verse.text}" — ${props.verse.book} ${props.verse.chapter}:${props.verse.verse} (${props.verse.version || 'KJV'})`
+  const fullText = `${textForCopy.value} — ${props.verse.book} ${referenceLabel.value} (${props.verse.version || 'WEB'})`
   navigator.clipboard.writeText(fullText).then(() => {
     copied.value = true
     setTimeout(() => {
@@ -86,7 +130,11 @@ function speakVerseText() {
   }
 
   window.speechSynthesis.cancel()
-  const utterance = new SpeechSynthesisUtterance(`${props.verse.book} chapter ${props.verse.chapter} verse ${props.verse.verse}. ${props.verse.text}`)
+  const utterance = new SpeechSynthesisUtterance(
+    verseList.value
+      .map((v) => `${props.verse.book} chapter ${v.chapter} verse ${v.verse}. ${v.text}`)
+      .join(' ')
+  )
   utterance.rate = 0.95
   utterance.pitch = 1.0
 
@@ -194,6 +242,48 @@ function speakVerseText() {
   position: relative;
   margin: 1.2rem 0 1.6rem;
   padding: 0 0.5rem;
+}
+
+.verse-block {
+  position: relative;
+  padding: 1rem 0;
+  border-bottom: 1px dashed rgba(26, 26, 26, 0.12);
+}
+
+.verse-block:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.verse-num-label {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9C27B0;
+}
+
+.verse-confidence {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.conf-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.conf-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2E7D32;
 }
 
 .quote-mark {

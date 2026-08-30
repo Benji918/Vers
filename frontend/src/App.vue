@@ -140,8 +140,13 @@ function toggleListening() {
   if (isListening.value || isMatching.value) {
     isListening.value = false
     isMatching.value = false
-    transcriptText.value = ''
-    if (audioService) audioService.stopListening()
+    if (audioService) {
+      if (audioService.accumulatedText) {
+        audioService.finalize()
+      } else {
+        audioService.stopListening()
+      }
+    }
   } else {
     isListening.value = true
     isMatching.value = false

@@ -80,10 +80,10 @@ class DeepgramStreamingClient:
                     alternatives = channel.get("alternatives", [])
                     if alternatives:
                         transcript = alternatives[0].get("transcript", "").strip()
-                        speech_final = data.get("speech_final", False) or data.get("is_final", False)
-                        
+                        utterance_complete = bool(data.get("speech_final", False))
+
                         if transcript and self.on_transcript:
-                            await self.on_transcript(transcript, speech_final)
+                            await self.on_transcript(transcript, utterance_complete)
                             
                 elif msg_type == "UtteranceEnd":
                     if self.on_transcript:
