@@ -49,7 +49,7 @@ class DeepgramStreamingClient:
             logger.info("Connected to Deepgram streaming endpoint")
             self._receive_task = asyncio.create_task(self._receiver_loop())
         except Exception as e:
-            logger.error(f"Failed to connect to Deepgram: {e}")
+            logger.error(f"Failed to connect to Deepgram: {print(DEEPGRAM_API_KEY), e}")
             self.is_connected = False
             raise
 
