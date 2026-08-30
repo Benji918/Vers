@@ -36,6 +36,9 @@ export class AudioWebSocketService {
     this.onAudioLevel = options.onAudioLevel || (() => {})
     this.onError = options.onError || (() => {})
     this.animationFrameId = null
+    this.silenceTimer = null
+    this.autoStopMs = options.autoStopMs || 1500
+    this._hadSpeech = false
   }
 
   async startListening() {
@@ -43,6 +46,8 @@ export class AudioWebSocketService {
 
     this.isListening = true
     this.accumulatedText = ''
+    this._hadSpeech = false
+    this._clearSilenceTimer()
     this.onStatusChange({ state: 'listening', message: 'Listening... speak your verse now' })
     this._simulateAudioLevel()
 
@@ -96,8 +101,8 @@ export class AudioWebSocketService {
         try {
           const data = JSON.parse(event.data)
           if (data.type === 'transcript') {
-            this._accumulateTranscript(data.text, data.is_final)
-            this.onTranscript(data.text, data.is_final)
+            const accumulated = this._accumulateTranscript(data.text, data.is_final)
+            this.onTranscript(this._buildDisplayText(data.text, data.is_final, accumulated))
           } else if (data.type === 'match') {
             this.onVerseMatch(data)
             this.stopListening()
@@ -162,13 +167,13 @@ export class AudioWebSocketService {
   }
 
   _accumulateTranscript(text, isFinal) {
-    if (!text || !isFinal) return
+    if (!text || !isFinal) return this.accumulatedText
     const cleaned = text.trim()
-    if (!cleaned) return
+    if (!cleaned) return this.accumulatedText
 
     if (!this.accumulatedText) {
       this.accumulatedText = cleaned
-      return
+      return this.accumulatedText
     }
 
     const current = this.accumulatedText.replace(/\s+$/, '')
@@ -176,7 +181,7 @@ export class AudioWebSocketService {
     // Case 1: within-utterance cumulative growth — new text starts with what we have.
     if (cleaned.startsWith(current)) {
       this.accumulatedText = cleaned
-      return
+      return this.accumulatedText
     }
 
     // Case 2: cross-utterance, the tail of current repeats at the head of cleaned.
@@ -184,11 +189,33 @@ export class AudioWebSocketService {
     if (overlap >= 2) {
       const tail = cleaned.split(' ').slice(overlap).join(' ')
       this.accumulatedText = tail ? `${current} ${tail}` : current
-      return
+      return this.accumulatedText
     }
 
     // Case 3: distinct chunks, just concatenate.
     this.accumulatedText = `${current} ${cleaned}`
+    return this.accumulatedText
+  }
+
+  _buildDisplayText(text, isFinal, accumulated) {
+    const base = (accumulated || '').trim()
+    if (isFinal || !text) return base
+
+    // Live partial: show committed text plus the still-forming current words.
+    const partial = text.trim()
+    if (!partial) return base
+
+    const baseWords = base ? base.split(' ') : []
+    const partialWords = partial.split(' ')
+
+    if (baseWords.length >= partialWords.length) {
+      const joined = baseWords.slice(0, partialWords.length).join(' ')
+      if (joined === partial) return base
+    }
+
+    const overlap = this._overlapWords(base, partial)
+    const tail = partialWords.slice(overlap).join(' ')
+    return tail ? `${base ? base + ' ' : ''}${tail}` : base
   }
 
   _overlapWords(current, next) {
@@ -240,8 +267,37 @@ export class AudioWebSocketService {
     const targetRate = 16000
     const sourceRate = this.audioContext ? this.audioContext.sampleRate : targetRate
     const pcm = this._encodeLinear16(input, sourceRate, targetRate)
+
+    let rms = 0
+    for (let i = 0; i < input.length; i++) rms += input[i] * input[i]
+    rms = Math.sqrt(rms / input.length)
+
+    if (rms > 0.02) {
+      this._hadSpeech = true
+      this._clearSilenceTimer()
+    } else if (this._hadSpeech && !this.silenceTimer) {
+      this.silenceTimer = setTimeout(() => this._autoFinalize(), this.autoStopMs)
+    }
+
     if (pcm && pcm.byteLength > 0 && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(pcm)
+    }
+  }
+
+  _clearSilenceTimer() {
+    if (this.silenceTimer) {
+      clearTimeout(this.silenceTimer)
+      this.silenceTimer = null
+    }
+  }
+
+  _autoFinalize() {
+    if (!this.isListening) return
+    this._clearSilenceTimer()
+    if (this.accumulatedText) {
+      this.finalize()
+    } else {
+      this.stopListening()
     }
   }
 
@@ -279,6 +335,9 @@ export class AudioWebSocketService {
   }
 
   _stopCapture() {
+    this._clearSilenceTimer()
+    this._hadSpeech = false
+
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId)
       this.animationFrameId = null

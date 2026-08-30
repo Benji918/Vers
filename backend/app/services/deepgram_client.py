@@ -76,14 +76,22 @@ class DeepgramStreamingClient:
                 msg_type = data.get("type", "")
                 
                 if msg_type == "Results" or "channel" in data:
-                    channel = data.get("channel", {})
+                    channel = data.get("channel") or {}
+                    if not isinstance(channel, dict):
+                        channel = {}
                     alternatives = channel.get("alternatives", [])
-                    if alternatives:
-                        transcript = alternatives[0].get("transcript", "").strip()
-                        utterance_complete = bool(data.get("speech_final", False))
-
-                        if transcript and self.on_transcript:
-                            await self.on_transcript(transcript, utterance_complete)
+                    if isinstance(alternatives, list):
+                        for alt in alternatives:
+                            if not isinstance(alt, dict):
+                                continue
+                            transcript = alt.get("transcript", "").strip()
+                            utterance_complete = bool(data.get("speech_final", False))
+                            if transcript and self.on_transcript:
+                                try:
+                                    await self.on_transcript(transcript, utterance_complete)
+                                except Exception:
+                                    return
+                            break
                             
                 elif msg_type == "UtteranceEnd":
                     if self.on_transcript:
@@ -92,7 +100,7 @@ class DeepgramStreamingClient:
         except websockets.exceptions.ConnectionClosed:
             logger.info("Deepgram connection closed normally")
         except Exception as e:
-            logger.error(f"Deepgram receiver exception: {e}")
+            logger.error(f"Deepgram receiver exception: {e}", exc_info=True)
         finally:
             self.is_connected = False
 
