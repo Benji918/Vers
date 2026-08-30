@@ -15,25 +15,18 @@
     <!-- Main Landing Viewport -->
     <main class="hero-main-container">
       <section class="hero-content">
-        <!-- Eyebrow Badge -->
-        <div class="eyebrow-pill">
-          <span class="eyebrow-sparkle">✦</span>
-          <span class="eyebrow-text">Voice-Driven Scripture Recognition</span>
-        </div>
-
-        <!-- Editorial Hero Headline in EB Garamond as specified in branding.json -->
+        <!-- Hero Headline in EB Garamond -->
         <h1 class="hero-headline">
           Speak a verse.<br />
           <span class="headline-italic">Discover where it is written.</span>
         </h1>
 
-        <!-- Refined Landing Subtitle in Figtree -->
+        <!-- Shorter, punchier subtitle -->
         <p class="hero-subtitle">
-          Say any passage, phrase, or half-remembered scripture aloud. 
-          Vers listens in real-time and pinpoints the exact book, chapter, and verse.
+          Say any scripture aloud. Vers pinpoints the exact book, chapter, and verse in real time.
         </p>
 
-        <!-- The Central Listen/Speak Master Button -->
+        <!-- The Central Listen/Speak Master Button (Bigger) -->
         <ListenButton 
           :isListening="isListening"
           :isMatching="isMatching"
@@ -44,8 +37,9 @@
         <!-- Live Live Transcript Display when Speaking -->
         <transition name="transcript-fade">
           <div v-if="isListening && transcriptText" class="live-transcript-bubble">
-            <span class="transcript-label">Heard:</span>
-            <span class="transcript-words">"{{ transcriptText }}"</span>
+            <span class="transcript-dot">●</span>
+            <span class="transcript-label">Transcribing:</span>
+            <span class="transcript-words">“{{ transcriptText }}”</span>
           </div>
         </transition>
 
@@ -69,7 +63,7 @@
     <!-- Footer -->
     <footer class="app-footer">
       <p class="footer-text">
-        <span>Vers</span> · Built with Vue.js, Deepgram Streaming & Local FTS5
+        <span>Vers</span> · Voice Scripture Recognition · Built with Vue.js, Deepgram Streaming & Local FTS5
       </p>
     </footer>
 
@@ -82,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import Navbar from './components/Navbar.vue'
 import ListenButton from './components/ListenButton.vue'
 import AudioWaveBackground from './components/AudioWaveBackground.vue'
@@ -115,13 +109,17 @@ function initializeAudioService() {
         isMatching.value = false
       }
     },
-    onTranscript: (text, isFinal) => {
+    onTranscript: (text) => {
       transcriptText.value = text
     },
     onVerseMatch: (verseData) => {
       matchedVerse.value = verseData
       isListening.value = false
       isMatching.value = false
+      nextTick(() => {
+        const card = document.querySelector('.verse-result-card')
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      })
     },
     onAudioLevel: (level) => {
       audioLevel.value = level
@@ -154,7 +152,6 @@ function handleSampleSelected(sample) {
   }
 }
 
-// Spacebar shortcut to trigger listen toggle
 function handleKeyDown(event) {
   if (event.code === 'Space' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') {
     event.preventDefault()
@@ -193,44 +190,18 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7rem 1.5rem 4rem;
+  padding: 6.5rem 1.5rem 2.5rem;
   position: relative;
   z-index: 10;
 }
 
 .hero-content {
   width: 100%;
-  max-width: 900px;
+  max-width: 880px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-}
-
-/* Eyebrow Pill Badge */
-.eyebrow-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.95rem;
-  border-radius: var(--radius-pill);
-  background: rgba(240, 215, 255, 0.6);
-  border: 1px solid rgba(217, 70, 239, 0.2);
-  margin-bottom: 1.75rem;
-  box-shadow: 0 2px 8px rgba(240, 215, 255, 0.4);
-}
-
-.eyebrow-sparkle {
-  color: #9C27B0;
-  font-size: 0.8rem;
-}
-
-.eyebrow-text {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 /* Hero Typography (EB Garamond as specified in branding.json) */
@@ -241,7 +212,7 @@ onUnmounted(() => {
   line-height: 1.08;
   letter-spacing: -0.025em;
   color: var(--color-text-primary);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.1rem;
 }
 
 .headline-italic {
@@ -253,11 +224,11 @@ onUnmounted(() => {
 /* Hero Subtitle in Figtree */
 .hero-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
   font-weight: 400;
   color: var(--color-text-secondary);
-  max-width: 620px;
-  line-height: 1.55;
+  max-width: 580px;
+  line-height: 1.5;
   margin-bottom: 0.5rem;
 }
 
@@ -266,12 +237,18 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.65rem 1.25rem;
-  background: rgba(255, 255, 255, 0.9);
+  padding: 0.65rem 1.35rem;
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid var(--color-border-accent);
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-soft);
   margin-top: 1rem;
+}
+
+.transcript-dot {
+  color: #D946EF;
+  font-size: 0.8rem;
+  animation: pulseGlow 1.2s infinite;
 }
 
 .transcript-label {
@@ -309,7 +286,7 @@ onUnmounted(() => {
 .result-slide-enter-from,
 .result-slide-leave-to {
   opacity: 0;
-  transform: translateY(24px) scale(0.96);
+  transform: translateY(20px) scale(0.97);
 }
 
 /* Footer */
@@ -322,7 +299,7 @@ onUnmounted(() => {
 }
 
 .footer-text {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
 }
 
@@ -334,7 +311,7 @@ onUnmounted(() => {
 
 @media (max-width: 640px) {
   .hero-main-container {
-    padding-top: 6rem;
+    padding-top: 5.5rem;
   }
 }
 </style>

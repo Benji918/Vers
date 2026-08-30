@@ -7,7 +7,7 @@
       <div class="wave wave-3"></div>
     </div>
 
-    <!-- Main Pill Button (Transitions from Speak to Listening) -->
+    <!-- Main Pill Button (Bigger and Tactile) -->
     <button 
       class="master-listen-button"
       :class="{ 
@@ -17,13 +17,13 @@
       @click="handleToggle"
       :aria-label="isListening ? 'Stop listening to verse' : 'Start speaking verse'"
     >
-      <!-- Background Ambient Glow & Glass Base -->
+      <!-- Background Ambient Glow Layer -->
       <div class="btn-ambient-glow"></div>
 
-      <!-- Content Layout: Idle / Speak State -->
+      <!-- State 1: Idle / Speak State -->
       <div v-if="!isListening && !isMatching" class="btn-content idle-state">
         <div class="mic-icon-circle">
-          <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
             <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
             <line x1="12" x2="12" y1="19" y2="22" />
@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <!-- Content Layout: Active Listening State -->
+      <!-- State 2: Active Listening State -->
       <div v-else-if="isListening" class="btn-content listening-state">
         <div class="live-dot-wrapper">
           <span class="live-recording-dot"></span>
@@ -48,7 +48,7 @@
 
         <div class="btn-text-group">
           <span class="btn-primary-label listening-title">Listening...</span>
-          <span class="btn-sub-label live-prompt">Speak out loud</span>
+          <span class="btn-sub-label live-prompt">Tap button to finish</span>
         </div>
 
         <!-- Equalizer Sound Frequency Bars -->
@@ -65,17 +65,17 @@
         </div>
       </div>
 
-      <!-- Content Layout: Matching / Processing State -->
+      <!-- State 3: Matching State -->
       <div v-else class="btn-content matching-state">
         <div class="spinner-ring"></div>
         <div class="btn-text-group">
-          <span class="btn-primary-label">Identifying verse...</span>
-          <span class="btn-sub-label">Searching scriptures</span>
+          <span class="btn-primary-label">Matching scripture...</span>
+          <span class="btn-sub-label">Searching local FTS5</span>
         </div>
       </div>
     </button>
 
-    <!-- Interactive Sub-Helper Text -->
+    <!-- Sub-Helper Text beneath Button -->
     <div class="button-footer-helper">
       <p v-if="!isListening && !isMatching" class="helper-text">
         <span class="sparkle-icon">✦</span>
@@ -83,18 +83,16 @@
       </p>
       <p v-else-if="isListening" class="helper-text active-prompt">
         <span class="pulse-text-icon">●</span>
-        Listening to your voice... tap button or press space to finish
+        Listening to your microphone... speak your verse now
       </p>
       <p v-else class="helper-text">
-        Running trigram text search against local Bible database...
+        Running trigram search against local Bible database...
       </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-
 const props = defineProps({
   isListening: {
     type: Boolean,
@@ -116,13 +114,12 @@ function handleToggle() {
   emit('toggle-listen')
 }
 
-// Compute reactive height scale for the 5 equalizer bars based on mic audio level
 function getBarHeight(index) {
-  if (!props.isListening) return 0.2
-  const base = Math.max(0.25, props.audioLevel)
-  const multipliers = [0.8, 1.3, 1.6, 1.2, 0.9]
-  const variation = (index % 2 === 0 ? 1 : 0.8)
-  const scale = Math.min(1.8, Math.max(0.2, base * multipliers[index] * variation))
+  if (!props.isListening) return 0.25
+  const base = Math.max(0.3, props.audioLevel)
+  const multipliers = [0.8, 1.4, 1.7, 1.3, 0.9]
+  const variation = (index % 2 === 0 ? 1 : 0.85)
+  const scale = Math.min(1.8, Math.max(0.25, base * multipliers[index] * variation))
   return scale.toFixed(2)
 }
 </script>
@@ -134,7 +131,7 @@ function getBarHeight(index) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 2.5rem 0 1.5rem;
+  margin: 2.2rem 0 1.4rem;
 }
 
 /* Radar Wave Aura */
@@ -142,8 +139,8 @@ function getBarHeight(index) {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 140px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 1;
@@ -156,8 +153,8 @@ function getBarHeight(index) {
   width: 100%;
   height: 100%;
   border-radius: var(--radius-pill);
-  border: 1.5px solid var(--color-secondary);
-  background: radial-gradient(circle, rgba(240, 215, 255, 0.3) 0%, rgba(228, 228, 208, 0) 70%);
+  border: 1.5px solid rgba(217, 70, 239, 0.5);
+  background: radial-gradient(circle, rgba(240, 215, 255, 0.4) 0%, rgba(228, 228, 208, 0) 70%);
 }
 
 .wave-1 {
@@ -172,16 +169,16 @@ function getBarHeight(index) {
   animation: radarWave3 2.2s cubic-bezier(0.1, 0.7, 0.4, 1) infinite 1.2s;
 }
 
-/* Master Pill Button (as defined in branding.json: borderRadius: 1600px, background: #E4E4D0, color: #1A1A1A) */
+/* Master Pill Button (Bigger footprint: 84px height, 340px min-width) */
 .master-listen-button {
   position: relative;
   z-index: 5;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 290px;
-  height: 74px;
-  padding: 0.5rem 1.6rem;
+  min-width: 340px;
+  height: 84px;
+  padding: 0.65rem 2rem;
   background-color: var(--color-accent);
   color: var(--color-text-primary);
   border-radius: var(--radius-pill);
@@ -193,9 +190,9 @@ function getBarHeight(index) {
 }
 
 .master-listen-button:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-2px) scale(1.025);
   background-color: #dedec8;
-  box-shadow: 0 10px 28px -4px rgba(26, 26, 26, 0.12), 0 0 0 1px rgba(26, 26, 26, 0.12);
+  box-shadow: 0 12px 32px -4px rgba(26, 26, 26, 0.14), 0 0 0 1px rgba(26, 26, 26, 0.12);
 }
 
 .master-listen-button:active {
@@ -205,7 +202,7 @@ function getBarHeight(index) {
 /* Listening Mode Button Visuals */
 .master-listen-button.is-listening {
   background-color: #FFFFFF;
-  border-color: rgba(217, 70, 239, 0.4);
+  border-color: rgba(217, 70, 239, 0.5);
   box-shadow: var(--shadow-glow-active);
   transform: scale(1.04);
 }
@@ -229,20 +226,20 @@ function getBarHeight(index) {
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 1.1rem;
+  gap: 1.25rem;
   width: 100%;
 }
 
 .mic-icon-circle {
-  width: 46px;
-  height: 46px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-primary);
-  box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08);
+  box-shadow: 0 3px 10px rgba(26, 26, 26, 0.08);
   transition: transform 0.3s ease;
 }
 
@@ -251,8 +248,8 @@ function getBarHeight(index) {
 }
 
 .mic-icon {
-  width: 22px;
-  height: 22px;
+  width: 25px;
+  height: 25px;
 }
 
 .btn-text-group {
@@ -265,14 +262,14 @@ function getBarHeight(index) {
 
 .btn-primary-label {
   font-family: var(--font-heading);
-  font-size: 1.35rem;
+  font-size: 1.55rem;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.1;
   color: var(--color-text-primary);
 }
 
 .btn-sub-label {
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   letter-spacing: 0.02em;
@@ -281,14 +278,14 @@ function getBarHeight(index) {
 .keyboard-badge {
   display: flex;
   align-items: center;
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
   background: rgba(26, 26, 26, 0.06);
   border: 1px solid rgba(26, 26, 26, 0.1);
 }
 
 .key-tag {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
@@ -296,21 +293,21 @@ function getBarHeight(index) {
 
 /* Active State Elements */
 .live-dot-wrapper {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: rgba(240, 215, 255, 0.5);
+  background: rgba(240, 215, 255, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .live-recording-dot {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #D946EF;
-  box-shadow: 0 0 12px #D946EF;
+  box-shadow: 0 0 14px #D946EF;
   animation: pulseGlow 1.2s infinite;
 }
 
@@ -327,14 +324,14 @@ function getBarHeight(index) {
 .audio-equalizer-bars {
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 28px;
+  gap: 5px;
+  height: 32px;
   padding: 0 0.5rem;
 }
 
 .eq-bar {
-  width: 3.5px;
-  height: 24px;
+  width: 4px;
+  height: 28px;
   background: #D946EF;
   border-radius: 4px;
   transform-origin: bottom;
@@ -345,9 +342,9 @@ function getBarHeight(index) {
 
 /* Spinner for matching state */
 .spinner-ring {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(26, 26, 26, 0.1);
+  width: 36px;
+  height: 36px;
+  border: 3.5px solid rgba(26, 26, 26, 0.1);
   border-top-color: var(--color-text-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -359,12 +356,12 @@ function getBarHeight(index) {
 
 /* Footer Helper */
 .button-footer-helper {
-  margin-top: 1.1rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
 .helper-text {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
@@ -385,5 +382,16 @@ function getBarHeight(index) {
 .active-prompt {
   color: #83279B;
   font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .master-listen-button {
+    min-width: 290px;
+    height: 76px;
+    padding: 0.5rem 1.4rem;
+  }
+  .btn-primary-label {
+    font-size: 1.35rem;
+  }
 }
 </style>

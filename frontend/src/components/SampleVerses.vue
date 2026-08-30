@@ -48,7 +48,7 @@ function getSnippet(text) {
 }
 
 .sample-label {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -66,14 +66,14 @@ function getSnippet(text) {
 .verse-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.85rem;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
   backdrop-filter: blur(8px);
   color: var(--color-text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -89,7 +89,7 @@ function getSnippet(text) {
   font-weight: 600;
   color: var(--color-text-primary);
   font-family: var(--font-heading);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .chip-preview {

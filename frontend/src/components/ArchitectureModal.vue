@@ -13,10 +13,10 @@
 
       <div class="modal-content">
         <p class="summary-lead">
-          <strong>"Shazam for Bible verses."</strong> Speak a verse aloud, and Vers identifies the exact book, chapter, and verse in real-time — with no LLM or vector embeddings involved in the matching.
+          <strong>"Shazam for Bible verses."</strong> Speak a verse aloud, and Vers identifies the exact book, chapter, and verse in real time — with no LLMs or vector embeddings involved in the matching.
         </p>
 
-        <!-- Pipeline Steps -->
+        <!-- Pipeline Steps with Bigger Readable Typography -->
         <div class="pipeline-grid">
           <div class="step-card">
             <div class="step-num">01</div>
@@ -33,7 +33,7 @@
           <div class="step-card">
             <div class="step-num">03</div>
             <h4 class="step-title">FTS5 Shortlist</h4>
-            <p class="step-desc">Classic full-text search queries local Bible DB to shortlist matching candidate verse candidates.</p>
+            <p class="step-desc">Classic full-text search queries local Bible DB to shortlist candidate verse candidates.</p>
           </div>
 
           <div class="step-card">
@@ -45,12 +45,12 @@
 
         <div class="principles-banner">
           <div class="principle-item">
-            <strong>✓ Zero Latency Overhead</strong>
-            <span>Local SQLite/PostgreSQL database eliminates third-party API hops</span>
+            <strong class="principle-title">✓ Zero Network API Latency</strong>
+            <span class="principle-desc">Local SQLite/PostgreSQL database eliminates third-party database network hops.</span>
           </div>
           <div class="principle-item">
-            <strong>✓ Deterministic & Explainable</strong>
-            <span>Pure text matching algorithms instead of hallucinations</span>
+            <strong class="principle-title">✓ 100% Deterministic & Explainable</strong>
+            <span class="principle-desc">Pure text search and trigram algorithms with no hallucinations.</span>
           </div>
         </div>
       </div>
@@ -78,9 +78,9 @@ defineEmits(['close'])
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(26, 26, 26, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(26, 26, 26, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,11 +95,11 @@ defineEmits(['close'])
 
 .modal-card {
   width: 100%;
-  max-width: 680px;
-  background: #FFFFF2;
+  max-width: 740px;
+  background: #FFFFF4;
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border-accent);
-  box-shadow: 0 24px 60px rgba(26, 26, 26, 0.15);
+  box-shadow: 0 24px 60px rgba(26, 26, 26, 0.18);
   overflow: hidden;
   animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -113,131 +113,154 @@ defineEmits(['close'])
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 1.75rem 2rem 1rem;
+  padding: 2rem 2.25rem 1.25rem;
 }
 
 .eyebrow-badge {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: #9C27B0;
   display: block;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
 .modal-title {
-  font-size: 1.75rem;
+  font-family: var(--font-heading);
+  font-size: 2.1rem;
   font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-text-primary);
 }
 
 .close-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(26, 26, 26, 0.05);
+  background: rgba(26, 26, 26, 0.06);
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 1rem;
   transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background: rgba(26, 26, 26, 0.1);
+  background: rgba(26, 26, 26, 0.12);
   color: var(--color-text-primary);
 }
 
 .modal-content {
-  padding: 0 2rem 1.5rem;
+  padding: 0 2.25rem 1.5rem;
 }
 
 .summary-lead {
-  font-size: 0.96rem;
+  font-size: 1.1rem;
   color: var(--color-text-secondary);
-  line-height: 1.55;
-  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  margin-bottom: 1.6rem;
+}
+
+.summary-lead strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
 }
 
 .pipeline-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.85rem;
-  margin-bottom: 1.25rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .step-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(26, 26, 26, 0.03);
 }
 
 .step-num {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #9C27B0;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
 .step-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  color: var(--color-text-primary);
 }
 
 .step-desc {
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   color: var(--color-text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .principles-banner {
-  background: rgba(240, 215, 255, 0.4);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
+  background: rgba(240, 215, 255, 0.45);
+  border: 1px solid rgba(217, 70, 239, 0.2);
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.85rem;
 }
 
 .principle-item {
   display: flex;
   flex-direction: column;
-  font-size: 0.82rem;
+  gap: 0.2rem;
+}
+
+.principle-title {
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--color-text-primary);
 }
 
-.principle-item span {
+.principle-desc {
+  font-size: 0.9rem;
   color: var(--color-text-secondary);
+  line-height: 1.45;
 }
 
 .modal-footer {
-  padding: 1rem 2rem 1.75rem;
+  padding: 1rem 2.25rem 2rem;
   display: flex;
   justify-content: flex-end;
 }
 
 .primary-btn {
-  padding: 0.55rem 1.5rem;
+  padding: 0.65rem 1.75rem;
   border-radius: var(--radius-pill);
   background: var(--color-text-primary);
   color: #FFFFFF;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
 }
 
 .primary-btn:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.15);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .pipeline-grid {
     grid-template-columns: 1fr;
+  }
+  .modal-header, .modal-content, .modal-footer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 </style>
