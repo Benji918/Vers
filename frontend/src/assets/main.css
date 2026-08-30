@@ -1,0 +1,152 @@
+:root {
+  /* Brand Color Palette from branding.json */
+  --color-primary: #FFFFEB;      /* Ivory / Warm Cream */
+  --color-secondary: #F0D7FF;    /* Ethereal Lilac / Lavender */
+  --color-accent: #E4E4D0;       /* Warm Sage / Champagne Accent */
+  --color-background: #FFFFEB;   /* Main Canvas */
+  --color-text-primary: #1A1A1A; /* Deep Charcoal / Ink */
+  --color-text-secondary: rgba(26, 26, 26, 0.72);
+  --color-text-muted: rgba(26, 26, 26, 0.48);
+  --color-link: #E4E4D0;
+  
+  /* Derived UI Tones */
+  --color-surface-glass: rgba(255, 255, 245, 0.75);
+  --color-surface-card: rgba(255, 255, 255, 0.85);
+  --color-surface-active: rgba(240, 215, 255, 0.45);
+  --color-border: rgba(26, 26, 26, 0.09);
+  --color-border-hover: rgba(26, 26, 26, 0.22);
+  --color-border-accent: rgba(228, 228, 208, 0.85);
+  
+  /* Typography */
+  --font-heading: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Spacing and Radii */
+  --radius-pill: 1600px;
+  --radius-card: 20px;
+  --radius-sm: 10px;
+  
+  /* Shadows */
+  --shadow-soft: 0 4px 20px -2px rgba(26, 26, 26, 0.05), 0 2px 6px -1px rgba(26, 26, 26, 0.03);
+  --shadow-elevated: 0 12px 36px -4px rgba(26, 26, 26, 0.08), 0 4px 12px -2px rgba(26, 26, 26, 0.04);
+  --shadow-button-idle: 0 4px 14px rgba(26, 26, 26, 0.06), 0 1px 3px rgba(26, 26, 26, 0.04);
+  --shadow-glow-active: 0 0 0 1px rgba(240, 215, 255, 0.8), 0 10px 40px rgba(240, 215, 255, 0.6), 0 0 80px rgba(228, 228, 208, 0.4);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 15% 20%, rgba(240, 215, 255, 0.45) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(228, 228, 208, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 235, 0.8) 0%, transparent 100%);
+  background-attachment: fixed;
+}
+
+/* Typography Helpers */
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
+}
+
+p, span, button, input, .font-body {
+  font-family: var(--font-body);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  outline: none;
+}
+
+/* Ambient Pulse Keyframes */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(240, 215, 255, 0.7), 0 0 20px rgba(228, 228, 208, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 16px rgba(240, 215, 255, 0), 0 0 45px rgba(240, 215, 255, 0.5);
+  }
+}
+
+@keyframes radarWave1 {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes radarWave2 {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@keyframes radarWave3 {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+@keyframes audioBarBounce {
+  0%, 100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes shimmerText {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
