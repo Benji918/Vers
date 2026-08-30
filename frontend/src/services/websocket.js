@@ -4,9 +4,16 @@
  * Sample prompts are fetched dynamically from the backend (no hardcoded Bible data).
  */
 
-const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-const API_BASE = `${window.location.protocol}//${window.location.hostname}:9000`
-const WS_URL = `${wsProtocol}//${window.location.hostname}:9000/ws/listen`
+const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+
+const API_BASE = isDev
+  ? `http://${window.location.hostname}:9000`
+  : `${window.location.protocol}//${window.location.host}`
+
+const WS_URL = isDev
+  ? `ws://${window.location.hostname}:9000/ws/listen`
+  : `${wsProtocol}://${window.location.host}/ws/listen`
 
 export async function fetchSampleVerses(n = 6) {
   try {
