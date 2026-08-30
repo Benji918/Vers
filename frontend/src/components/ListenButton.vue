@@ -1,13 +1,13 @@
 <template>
   <div class="listen-button-container">
-    <!-- Animated Radar Waves when in Listening Mode -->
+    <!-- Animated Radar Waves when in Listening Mode (Positioned absolutely behind button) -->
     <div v-if="isListening" class="radar-aura" aria-hidden="true">
       <div class="wave wave-1"></div>
       <div class="wave wave-2"></div>
       <div class="wave wave-3"></div>
     </div>
 
-    <!-- Main Pill Button (Snappy & Fast Transitions) -->
+    <!-- Main Pill Button (Strict dimension lock so it never jumps) -->
     <button 
       class="master-listen-button"
       :class="{ 
@@ -75,7 +75,7 @@
       </div>
     </button>
 
-    <!-- Sub-Helper Text beneath Button -->
+    <!-- Fixed Height Helper Container (Eliminates vertical height shifts) -->
     <div class="button-footer-helper">
       <p v-if="!isListening && !isMatching" class="helper-text">
         <span class="sparkle-icon">✦</span>
@@ -131,13 +131,13 @@ function getBarHeight(index) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 2.2rem 0 1.4rem;
+  margin: 2rem 0 0.5rem;
 }
 
 /* Radar Wave Aura */
 .radar-aura {
   position: absolute;
-  top: 50%;
+  top: 42px;
   left: 50%;
   width: 140px;
   height: 140px;
@@ -169,7 +169,7 @@ function getBarHeight(index) {
   animation: radarWave3 2.2s cubic-bezier(0.1, 0.7, 0.4, 1) infinite 1.2s;
 }
 
-/* Master Pill Button (Fast 0.15s transition) */
+/* Master Pill Button (Fixed 84px height so no layout resizing occurs) */
 .master-listen-button {
   position: relative;
   z-index: 5;
@@ -178,25 +178,20 @@ function getBarHeight(index) {
   justify-content: center;
   min-width: 340px;
   height: 84px;
-  padding: 0.65rem 2rem;
+  padding: 0 2rem;
   background-color: var(--color-accent);
   color: var(--color-text-primary);
   border-radius: var(--radius-pill);
   border: 1px solid rgba(26, 26, 26, 0.08);
   box-shadow: var(--shadow-button-idle);
-  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   overflow: hidden;
   user-select: none;
 }
 
 .master-listen-button:hover {
-  transform: translateY(-2px) scale(1.025);
   background-color: #dedec8;
   box-shadow: 0 12px 32px -4px rgba(26, 26, 26, 0.14), 0 0 0 1px rgba(26, 26, 26, 0.12);
-}
-
-.master-listen-button:active {
-  transform: translateY(1px) scale(0.98);
 }
 
 /* Listening Mode Button Visuals */
@@ -204,7 +199,6 @@ function getBarHeight(index) {
   background-color: #FFFFFF;
   border-color: rgba(217, 70, 239, 0.5);
   box-shadow: var(--shadow-glow-active);
-  transform: scale(1.04);
 }
 
 .master-listen-button.is-matching {
@@ -244,7 +238,7 @@ function getBarHeight(index) {
 }
 
 .master-listen-button:hover .mic-icon-circle {
-  transform: scale(1.08) rotate(4deg);
+  transform: scale(1.06) rotate(4deg);
 }
 
 .mic-icon {
@@ -354,9 +348,13 @@ function getBarHeight(index) {
   to { transform: rotate(360deg); }
 }
 
-/* Footer Helper */
+/* Fixed Height Footer Helper: Exactly 28px min-height to prevent jumping */
 .button-footer-helper {
   margin-top: 1rem;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -367,6 +365,7 @@ function getBarHeight(index) {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
+  line-height: 1;
 }
 
 .sparkle-icon {
@@ -388,7 +387,7 @@ function getBarHeight(index) {
   .master-listen-button {
     min-width: 290px;
     height: 76px;
-    padding: 0.5rem 1.4rem;
+    padding: 0 1.4rem;
   }
   .btn-primary-label {
     font-size: 1.35rem;

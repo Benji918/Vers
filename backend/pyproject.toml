@@ -8,4 +8,5 @@ dependencies = [
     "fastapi>=0.141.1",
     "requests>=2.34.2",
     "tortoise-orm>=1.1.8",
+    "uvicorn>=0.52.4",
 ]

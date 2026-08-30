@@ -12,21 +12,21 @@
       @open-architecture="showArchitectureModal = true"
     />
 
-    <!-- Main Landing Viewport -->
+    <!-- Main Landing Viewport (Top-anchored so headline never shifts) -->
     <main class="hero-main-container">
       <section class="hero-content">
-        <!-- Hero Headline in EB Garamond -->
+        <!-- Static Hero Headline (Always rock-solid in place) -->
         <h1 class="hero-headline">
           Speak a verse.<br />
           <span class="headline-italic">Discover where it is written.</span>
         </h1>
 
-        <!-- Shorter, punchier subtitle -->
+        <!-- Subtitle -->
         <p class="hero-subtitle">
           Say any scripture aloud. Vers pinpoints the exact book, chapter, and verse in real time.
         </p>
 
-        <!-- The Central Listen/Speak Master Button (Instant 0ms transition) -->
+        <!-- The Central Listen/Speak Master Button -->
         <ListenButton 
           :isListening="isListening"
           :isMatching="isMatching"
@@ -34,14 +34,16 @@
           @toggle-listen="toggleListening"
         />
 
-        <!-- Live Live Transcript Display when Speaking -->
-        <transition name="transcript-fade">
-          <div v-if="isListening && transcriptText" class="live-transcript-bubble">
-            <span class="transcript-dot">●</span>
-            <span class="transcript-label">Transcribing:</span>
-            <span class="transcript-words">“{{ transcriptText }}”</span>
-          </div>
-        </transition>
+        <!-- Stable Reserved Slot for Live Transcript Bubble (Zero layout shift) -->
+        <div class="transcript-slot-wrapper">
+          <transition name="transcript-fade">
+            <div v-if="isListening && transcriptText" class="live-transcript-bubble">
+              <span class="transcript-dot">●</span>
+              <span class="transcript-label">Transcribing:</span>
+              <span class="transcript-words">“{{ transcriptText }}”</span>
+            </div>
+          </transition>
+        </div>
 
         <!-- Matched Verse Result Card -->
         <transition name="result-slide">
@@ -134,12 +136,11 @@ function initializeAudioService() {
 
 function toggleListening() {
   if (isListening.value || isMatching.value) {
-    // Instant stop
     isListening.value = false
     isMatching.value = false
+    transcriptText.value = ''
     if (audioService) audioService.stopListening()
   } else {
-    // Instant UI switch on click (0ms delay)
     isListening.value = true
     isMatching.value = false
     transcriptText.value = ''
@@ -191,12 +192,14 @@ onUnmounted(() => {
   overflow-x: hidden;
 }
 
+/* Top-anchored layout: No vertical re-centering jump */
 .hero-main-container {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 6.5rem 1.5rem 2.5rem;
+  justify-content: flex-start;
+  padding: 7rem 1.5rem 3rem;
   position: relative;
   z-index: 10;
 }
@@ -238,17 +241,25 @@ onUnmounted(() => {
   margin-bottom: 0.5rem;
 }
 
-/* Live transcript bubble */
+/* Stable Slot for Live Transcript */
+.transcript-slot-wrapper {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .live-transcript-bubble {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.65rem 1.35rem;
+  padding: 0.55rem 1.35rem;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid var(--color-border-accent);
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-soft);
-  margin-top: 1rem;
 }
 
 .transcript-dot {
@@ -275,13 +286,13 @@ onUnmounted(() => {
 /* Transitions */
 .transcript-fade-enter-active,
 .transcript-fade-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .transcript-fade-enter-from,
 .transcript-fade-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(6px);
 }
 
 .result-slide-enter-active,
