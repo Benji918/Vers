@@ -1,13 +1,13 @@
 <template>
   <header class="navbar-wrapper">
     <nav class="navbar-container">
-      <!-- Brand Logo: Bible with Microphone at top-right corner -->
+      <!-- Brand Logo: Bible with Microphone at top-right corner (No circle background) -->
       <a href="/" class="brand-link" title="Vers — Scripture by Voice">
         <div class="brand-icon-wrapper">
           <svg class="brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Bible Book Body -->
             <rect x="3.5" y="8" width="20" height="23" rx="3" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2" />
-            <!-- Book Spine / Edge Accent -->
+            <!-- Book Spine Accent -->
             <path d="M7 8V31" stroke="#1A1A1A" stroke-width="1.5" opacity="0.4" />
             <!-- Book Spine Ribbon / Bookmark -->
             <path d="M10 8V14L12 12.5L14 14V8" fill="#E4E4D0" stroke="#1A1A1A" stroke-width="1" />
@@ -106,33 +106,30 @@ defineEmits(['open-architecture'])
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   text-decoration: none;
   color: var(--color-text-primary);
 }
 
+/* Transparent wrapper with no background circle */
 .brand-icon-wrapper {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08);
+  background: transparent;
+  padding: 0;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 2px;
 }
 
 .brand-link:hover .brand-icon-wrapper {
   transform: scale(1.08) rotate(-3deg);
-  background: #dadac2;
 }
 
 .brand-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   overflow: visible;
+  display: block;
 }
 
 .brand-meta {
@@ -142,7 +139,7 @@ defineEmits(['open-architecture'])
 
 .brand-name {
   font-family: var(--font-heading);
-  font-size: 1.55rem;
+  font-size: 1.6rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
