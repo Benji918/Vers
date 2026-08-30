@@ -7,7 +7,7 @@
       <div class="wave wave-3"></div>
     </div>
 
-    <!-- Main Pill Button (Bigger and Tactile) -->
+    <!-- Main Pill Button (Snappy & Fast Transitions) -->
     <button 
       class="master-listen-button"
       :class="{ 
@@ -59,7 +59,7 @@
             class="eq-bar" 
             :style="{ 
               '--bar-scale': getBarHeight(i),
-              '--anim-delay': `${i * 0.12}s`
+              '--anim-delay': `${i * 0.1}s`
             }"
           ></span>
         </div>
@@ -104,7 +104,7 @@ const props = defineProps({
   },
   audioLevel: {
     type: Number,
-    default: 0
+    default: 0.3
   }
 })
 
@@ -116,8 +116,8 @@ function handleToggle() {
 
 function getBarHeight(index) {
   if (!props.isListening) return 0.25
-  const base = Math.max(0.3, props.audioLevel)
-  const multipliers = [0.8, 1.4, 1.7, 1.3, 0.9]
+  const base = Math.max(0.35, props.audioLevel)
+  const multipliers = [0.85, 1.45, 1.75, 1.35, 0.95]
   const variation = (index % 2 === 0 ? 1 : 0.85)
   const scale = Math.min(1.8, Math.max(0.25, base * multipliers[index] * variation))
   return scale.toFixed(2)
@@ -169,7 +169,7 @@ function getBarHeight(index) {
   animation: radarWave3 2.2s cubic-bezier(0.1, 0.7, 0.4, 1) infinite 1.2s;
 }
 
-/* Master Pill Button (Bigger footprint: 84px height, 340px min-width) */
+/* Master Pill Button (Fast 0.15s transition) */
 .master-listen-button {
   position: relative;
   z-index: 5;
@@ -184,7 +184,7 @@ function getBarHeight(index) {
   border-radius: var(--radius-pill);
   border: 1px solid rgba(26, 26, 26, 0.08);
   box-shadow: var(--shadow-button-idle);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
   overflow: hidden;
   user-select: none;
 }
@@ -240,7 +240,7 @@ function getBarHeight(index) {
   justify-content: center;
   color: var(--color-text-primary);
   box-shadow: 0 3px 10px rgba(26, 26, 26, 0.08);
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
 }
 
 .master-listen-button:hover .mic-icon-circle {
@@ -336,7 +336,7 @@ function getBarHeight(index) {
   border-radius: 4px;
   transform-origin: bottom;
   transform: scaleY(var(--bar-scale, 0.4));
-  transition: transform 0.1s ease-out;
+  transition: transform 0.08s ease-out;
   animation: audioBarBounce 0.8s ease-in-out infinite alternate var(--anim-delay, 0s);
 }
 

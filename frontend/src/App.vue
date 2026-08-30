@@ -26,7 +26,7 @@
           Say any scripture aloud. Vers pinpoints the exact book, chapter, and verse in real time.
         </p>
 
-        <!-- The Central Listen/Speak Master Button (Bigger) -->
+        <!-- The Central Listen/Speak Master Button (Instant 0ms transition) -->
         <ListenButton 
           :isListening="isListening"
           :isMatching="isMatching"
@@ -88,7 +88,7 @@ import { AudioWebSocketService } from './services/websocket.js'
 // State
 const isListening = ref(false)
 const isMatching = ref(false)
-const audioLevel = ref(0)
+const audioLevel = ref(0.3)
 const transcriptText = ref('')
 const matchedVerse = ref(null)
 const showArchitectureModal = ref(false)
@@ -134,10 +134,14 @@ function initializeAudioService() {
 
 function toggleListening() {
   if (isListening.value || isMatching.value) {
-    if (audioService) audioService.stopListening()
+    // Instant stop
     isListening.value = false
     isMatching.value = false
+    if (audioService) audioService.stopListening()
   } else {
+    // Instant UI switch on click (0ms delay)
+    isListening.value = true
+    isMatching.value = false
     transcriptText.value = ''
     matchedVerse.value = null
     if (audioService) audioService.startListening()
@@ -145,6 +149,8 @@ function toggleListening() {
 }
 
 function handleSampleSelected(sample) {
+  isListening.value = true
+  isMatching.value = false
   transcriptText.value = ''
   matchedVerse.value = null
   if (audioService) {
@@ -204,7 +210,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-/* Hero Typography (EB Garamond as specified in branding.json) */
+/* Hero Typography */
 .hero-headline {
   font-family: var(--font-heading);
   font-size: clamp(2.8rem, 6vw, 4.2rem);
@@ -221,7 +227,7 @@ onUnmounted(() => {
   color: #2b2b2b;
 }
 
-/* Hero Subtitle in Figtree */
+/* Hero Subtitle */
 .hero-subtitle {
   font-family: var(--font-body);
   font-size: clamp(1.1rem, 2vw, 1.25rem);
@@ -269,24 +275,24 @@ onUnmounted(() => {
 /* Transitions */
 .transcript-fade-enter-active,
 .transcript-fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .transcript-fade-enter-from,
 .transcript-fade-leave-to {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(8px);
 }
 
 .result-slide-enter-active,
 .result-slide-leave-active {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .result-slide-enter-from,
 .result-slide-leave-to {
   opacity: 0;
-  transform: translateY(20px) scale(0.97);
+  transform: translateY(16px) scale(0.98);
 }
 
 /* Footer */
