@@ -26,6 +26,7 @@ async def websocket_listen(websocket: WebSocket):
         match is computed once the client stops and sends the full
         accumulated text via a text_query message.
         """
+        logger.info(f"TRANSCRIPT is_final={is_final}: {transcript!r}")
         await websocket.send_json({
             "type": "transcript",
             "text": transcript,
@@ -54,6 +55,7 @@ async def websocket_listen(websocket: WebSocket):
             elif "text" in message and message["text"]:
                 try:
                     payload = json.loads(message["text"])
+                    logger.info(f"WS text message: {payload}")
                     if payload.get("type") == "text_query":
                         query_text = payload.get("text", "")
                         matched = find_verses(query_text)

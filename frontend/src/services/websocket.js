@@ -39,6 +39,7 @@ export class AudioWebSocketService {
     this.silenceTimer = null
     this.autoStopMs = options.autoStopMs || 1500
     this._hadSpeech = false
+    this.lastTranscript = ''
   }
 
   async startListening() {
@@ -46,6 +47,7 @@ export class AudioWebSocketService {
 
     this.isListening = true
     this.accumulatedText = ''
+    this.lastTranscript = ''
     this._hadSpeech = false
     this._clearSilenceTimer()
     this.onStatusChange({ state: 'listening', message: 'Listening... speak your verse now' })
@@ -101,6 +103,7 @@ export class AudioWebSocketService {
         try {
           const data = JSON.parse(event.data)
           if (data.type === 'transcript') {
+            if (data.text) this.lastTranscript = data.text.trim()
             const accumulated = this._accumulateTranscript(data.text, data.is_final)
             this.onTranscript(this._buildDisplayText(data.text, data.is_final, accumulated))
           } else if (data.type === 'match') {
@@ -233,7 +236,7 @@ export class AudioWebSocketService {
   }
 
   finalize() {
-    const text = this.accumulatedText.trim()
+    const text = (this.accumulatedText || this.lastTranscript || '').trim()
     if (!text) return
     this._stopCapture()
     this.sendTextQuery(text)
@@ -294,7 +297,7 @@ export class AudioWebSocketService {
   _autoFinalize() {
     if (!this.isListening) return
     this._clearSilenceTimer()
-    if (this.accumulatedText) {
+    if (this.accumulatedText || this.lastTranscript) {
       this.finalize()
     } else {
       this.stopListening()
@@ -373,6 +376,7 @@ export class AudioWebSocketService {
   stopListening() {
     this.isListening = false
     this.accumulatedText = ''
+    this.lastTranscript = ''
     this._stopCapture()
 
     if (this.socket) {

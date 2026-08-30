@@ -54,7 +54,7 @@ def _score_candidates(sanitized: str, db_path: str, limit: int = 20) -> list:
         for cand in candidates:
             cand_id, book_id, chapter, verse, text, rank = cand
             cand_clean = sanitize_transcript(text or "")
-            score = fuzz.token_sort_ratio(sanitized, cand_clean)
+            score = fuzz.token_set_ratio(sanitized, cand_clean)
             scored.append({
                 "book": BOOK_NAMES.get(book_id, f"Book {book_id}"),
                 "chapter": chapter,
