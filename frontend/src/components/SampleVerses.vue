@@ -17,12 +17,10 @@
 </template>
 
 <script setup>
-import { SAMPLE_VERSES_DB } from '@/services/websocket.js'
-
 defineProps({
   sampleVerses: {
     type: Array,
-    default: () => SAMPLE_VERSES_DB.slice(0, 4)
+    default: () => []
   }
 })
 

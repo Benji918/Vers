@@ -28,6 +28,9 @@ class DeepgramStreamingClient:
         
         params = {
             "model": DEEPGRAM_MODEL,
+            "encoding": AUDIO_ENCODING,
+            "sample_rate": str(AUDIO_SAMPLE_RATE),
+            "channels": str(AUDIO_CHANNELS),
             "interim_results": "true",
             "endpointing": str(ENDPOINTING_MS),
             "utterance_end_ms": str(UTTERANCE_END_MS),
@@ -62,7 +65,14 @@ class DeepgramStreamingClient:
         """Listens for incoming transcript events and dispatches them."""
         try:
             async for message in self.ws:
-                data = json.loads(message)
+                try:
+                    data = json.loads(message)
+                except json.JSONDecodeError:
+                    continue
+
+                if not isinstance(data, dict):
+                    continue
+
                 msg_type = data.get("type", "")
                 
                 if msg_type == "Results" or "channel" in data:

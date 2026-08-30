@@ -59,7 +59,11 @@ async def websocket_listen(websocket: WebSocket):
 
         while True:
             message = await websocket.receive()
-            
+
+            if message.get("type") == "websocket.disconnect":
+                logger.info("Client disconnected from /ws/listen")
+                break
+
             if "bytes" in message and message["bytes"]:
                 await deepgram_client.send_audio(message["bytes"])
                 

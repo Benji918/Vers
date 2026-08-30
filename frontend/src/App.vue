@@ -57,6 +57,7 @@
         <!-- Interactive Sample Verses Chips -->
         <SampleVerses 
           v-if="!matchedVerse"
+          :sampleVerses="sampleVerses"
           @select-sample="handleSampleSelected" 
         />
       </section>
@@ -85,7 +86,7 @@ import AudioWaveBackground from './components/AudioWaveBackground.vue'
 import VerseResult from './components/VerseResult.vue'
 import SampleVerses from './components/SampleVerses.vue'
 import ArchitectureModal from './components/ArchitectureModal.vue'
-import { AudioWebSocketService } from './services/websocket.js'
+import { AudioWebSocketService, fetchSampleVerses } from './services/websocket.js'
 
 // State
 const isListening = ref(false)
@@ -94,6 +95,7 @@ const audioLevel = ref(0.3)
 const transcriptText = ref('')
 const matchedVerse = ref(null)
 const showArchitectureModal = ref(false)
+const sampleVerses = ref([])
 
 let audioService = null
 
@@ -150,12 +152,12 @@ function toggleListening() {
 }
 
 function handleSampleSelected(sample) {
-  isListening.value = true
-  isMatching.value = false
-  transcriptText.value = ''
+  isListening.value = false
+  isMatching.value = true
+  transcriptText.value = sample.text
   matchedVerse.value = null
   if (audioService) {
-    audioService.startListening(sample)
+    audioService.sendTextQuery(sample.text)
   }
 }
 
@@ -172,9 +174,10 @@ function handleKeyDown(event) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   initializeAudioService()
   window.addEventListener('keydown', handleKeyDown)
+  sampleVerses.value = await fetchSampleVerses(6)
 })
 
 onUnmounted(() => {

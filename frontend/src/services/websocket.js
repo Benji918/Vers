@@ -1,76 +1,33 @@
 /**
  * WebSocket Audio Streaming & Verse Matching Service
- * Connects frontend mic audio to FastAPI backend at ws://localhost:8000/ws/listen
- * Includes instant reactive UI feedback with fallback demo simulation.
+ * Connects frontend mic audio to the FastAPI backend at /ws/listen.
+ * Sample prompts are fetched dynamically from the backend (no hardcoded Bible data).
  */
 
-const SAMPLE_VERSES_DB = [
-  {
-    book: "John",
-    chapter: 3,
-    verse: 16,
-    version: "KJV",
-    text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
-  },
-  {
-    book: "Psalms",
-    chapter: 23,
-    verse: 1,
-    version: "KJV",
-    text: "The Lord is my shepherd; I shall not want."
-  },
-  {
-    book: "Philippians",
-    chapter: 4,
-    verse: 13,
-    version: "KJV",
-    text: "I can do all things through Christ which strengtheneth me."
-  },
-  {
-    book: "Genesis",
-    chapter: 1,
-    verse: 1,
-    version: "KJV",
-    text: "In the beginning God created the heaven and the earth."
-  },
-  {
-    book: "Proverbs",
-    chapter: 3,
-    verse: 5,
-    version: "KJV",
-    text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding."
-  },
-  {
-    book: "Romans",
-    chapter: 8,
-    verse: 28,
-    version: "KJV",
-    text: "And we know that all things work together for good to them that love God, to them who are the called according to his purpose."
-  },
-  {
-    book: "Jeremiah",
-    chapter: 29,
-    verse: 11,
-    version: "KJV",
-    text: "For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end."
-  },
-  {
-    book: "1 Corinthians",
-    chapter: 13,
-    verse: 4,
-    version: "KJV",
-    text: "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up,"
+const API_BASE = `http://${window.location.hostname}:9000`
+const WS_URL = `ws://${window.location.hostname}:9000/ws/listen`
+
+export async function fetchSampleVerses(n = 6) {
+  try {
+    const res = await fetch(`${API_BASE}/api/samples?n=${n}`)
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+    const data = await res.json()
+    return Array.isArray(data.samples) ? data.samples : []
+  } catch (e) {
+    console.warn('Failed to load sample verses from backend:', e)
+    return []
   }
-]
+}
 
 export class AudioWebSocketService {
   constructor(options = {}) {
-    this.wsUrl = options.wsUrl || `ws://${window.location.hostname}:8000/ws/listen`
+    this.wsUrl = options.wsUrl || WS_URL
     this.socket = null
     this.audioContext = null
     this.mediaStream = null
     this.analyser = null
     this.processorNode = null
+    this._silentGain = null
     this.isListening = false
     this.onStatusChange = options.onStatusChange || (() => {})
     this.onTranscript = options.onTranscript || (() => {})
@@ -78,23 +35,20 @@ export class AudioWebSocketService {
     this.onAudioLevel = options.onAudioLevel || (() => {})
     this.onError = options.onError || (() => {})
     this.animationFrameId = null
-    this.mockTimer = null
   }
 
-  async startListening(forcedVerse = null) {
+  async startListening() {
     if (this.isListening) return
 
     this.isListening = true
-    // INSTANTLY notify UI to transition to listening mode without delay
     this.onStatusChange({ state: 'listening', message: 'Listening... speak your verse now' })
-
-    // Start simulated visualizer immediately so soundbars bounce right away
     this._simulateAudioLevel()
 
-    // Acquire microphone in parallel without blocking UI
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({
         audio: {
+          channelCount: 1,
+          sampleRate: 16000,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
@@ -105,20 +59,29 @@ export class AudioWebSocketService {
           return
         }
         this.mediaStream = stream
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 })
         const source = this.audioContext.createMediaStreamSource(this.mediaStream)
         this.analyser = this.audioContext.createAnalyser()
         this.analyser.fftSize = 128
         source.connect(this.analyser)
 
+        this.processorNode = this.audioContext.createScriptProcessor(4096, 1, 1)
+        source.connect(this.processorNode)
+        this._silentGain = this.audioContext.createGain()
+        this._silentGain.gain.value = 0
+        this.processorNode.connect(this._silentGain)
+        this._silentGain.connect(this.audioContext.destination)
+        this.processorNode.onaudioprocess = this._handleAudioProcess
+
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId)
         this._trackAudioLevel()
       }).catch((err) => {
-        console.info('Using simulated visualizer:', err.message)
+        this.onError({ message: 'Microphone access denied', detail: err.message })
       })
+    } else {
+      this.onError({ message: 'Microphone not supported in this browser' })
     }
 
-    // Try connecting to live FastAPI WebSocket backend
     try {
       this.socket = new WebSocket(this.wsUrl)
       this.socket.binaryType = 'arraybuffer'
@@ -132,8 +95,11 @@ export class AudioWebSocketService {
           const data = JSON.parse(event.data)
           if (data.type === 'transcript') {
             this.onTranscript(data.text, data.is_final)
-          } else if (data.type === 'match' || data.book) {
+          } else if (data.type === 'match') {
             this.onVerseMatch(data)
+            this.stopListening()
+          } else if (data.type === 'no_match') {
+            this.onError(data)
             this.stopListening()
           }
         } catch (e) {
@@ -142,67 +108,54 @@ export class AudioWebSocketService {
       }
 
       this.socket.onerror = () => {
-        this._handleSimulationFallback(forcedVerse)
+        this.onStatusChange({ state: 'listening', message: 'Backend connection lost' })
       }
 
       this.socket.onclose = () => {
-        if (this.isListening && !this.mockTimer) {
-          this._handleSimulationFallback(forcedVerse)
+        if (this.isListening) {
+          this.onStatusChange({ state: 'idle', message: 'Backend unavailable' })
         }
       }
-    } catch (err) {
-      this._handleSimulationFallback(forcedVerse)
+    } catch (e) {
+      this.onError(e)
     }
-
-    // Trigger simulation if backend socket doesn't open immediately
-    setTimeout(() => {
-      if (this.isListening && (!this.socket || this.socket.readyState !== WebSocket.OPEN) && !this.mockTimer) {
-        this._handleSimulationFallback(forcedVerse)
-      }
-    }, 250)
   }
 
-  _handleSimulationFallback(forcedVerse) {
-    if (!this.isListening || this.mockTimer) return
-    
-    const targetVerse = forcedVerse || SAMPLE_VERSES_DB[Math.floor(Math.random() * SAMPLE_VERSES_DB.length)]
-    const words = targetVerse.text.split(' ')
-    let currentWordIdx = 0
-    let accumulatedTranscript = ''
+  async sendTextQuery(text) {
+    if (!text) return
+    this.isListening = true
+    this.onStatusChange({ state: 'matching', message: 'Matching against Bible database...' })
 
-    this.mockTimer = setInterval(() => {
-      if (!this.isListening) {
-        clearInterval(this.mockTimer)
-        this.mockTimer = null
-        return
-      }
-
-      if (currentWordIdx < Math.min(words.length, 6)) {
-        accumulatedTranscript += (currentWordIdx === 0 ? '' : ' ') + words[currentWordIdx]
-        currentWordIdx++
-        this.onTranscript(accumulatedTranscript, false)
+    const send = () => {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(JSON.stringify({ type: 'text_query', text }))
       } else {
-        clearInterval(this.mockTimer)
-        this.mockTimer = null
-        this.onTranscript(accumulatedTranscript + '...', true)
-        this.onStatusChange({ state: 'matching', message: 'Matching against Bible database...' })
+        this.onError({ message: 'Backend not connected, cannot process query' })
+      }
+    }
 
-        setTimeout(() => {
-          if (this.isListening) {
-            this.onVerseMatch({
-              book: targetVerse.book,
-              chapter: targetVerse.chapter,
-              verse: targetVerse.verse,
-              version: targetVerse.version || 'KJV',
-              text: targetVerse.text,
-              confidence: 0.985,
-              matchType: 'Full-Text Search (FTS5) + Trigram Fuzzy Match'
-            })
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      this.socket = new WebSocket(this.wsUrl)
+      this.socket.binaryType = 'arraybuffer'
+      this.socket.onopen = send
+      this.socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          if (data.type === 'match') {
+            this.onVerseMatch(data)
+            this.stopListening()
+          } else if (data.type === 'no_match') {
+            this.onError(data)
             this.stopListening()
           }
-        }, 500)
+        } catch (e) {
+          console.error('Failed to parse WebSocket message', e)
+        }
       }
-    }, 400)
+      this.socket.onerror = () => this.onError({ message: 'Backend not connected' })
+    } else {
+      send()
+    }
   }
 
   _trackAudioLevel() {
@@ -225,6 +178,41 @@ export class AudioWebSocketService {
     update()
   }
 
+  _handleAudioProcess = (event) => {
+    if (!this.isListening) return
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return
+
+    const input = event.inputBuffer.getChannelData(0)
+    const targetRate = 16000
+    const sourceRate = this.audioContext ? this.audioContext.sampleRate : targetRate
+    const pcm = this._encodeLinear16(input, sourceRate, targetRate)
+    if (pcm && pcm.byteLength > 0 && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(pcm)
+    }
+  }
+
+  _encodeLinear16(input, sourceRate, targetRate) {
+    if (!input || input.length === 0) return null
+
+    let samples = input
+    if (sourceRate !== targetRate && sourceRate > 0) {
+      const ratio = sourceRate / targetRate
+      const outLength = Math.max(1, Math.floor(input.length / ratio))
+      samples = new Float32Array(outLength)
+      for (let i = 0; i < outLength; i++) {
+        const idx = Math.min(input.length - 1, Math.floor(i * ratio))
+        samples[i] = input[idx]
+      }
+    }
+
+    const pcm = new Int16Array(samples.length)
+    for (let i = 0; i < samples.length; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i]))
+      pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff
+    }
+    return pcm.buffer
+  }
+
   _simulateAudioLevel() {
     const update = () => {
       if (!this.isListening) return
@@ -238,14 +226,24 @@ export class AudioWebSocketService {
 
   stopListening() {
     this.isListening = false
-    if (this.mockTimer) {
-      clearInterval(this.mockTimer)
-      this.mockTimer = null
-    }
-
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId)
       this.animationFrameId = null
+    }
+
+    if (this.processorNode) {
+      try {
+        this.processorNode.disconnect()
+      } catch (e) {}
+      this.processorNode.onaudioprocess = null
+      this.processorNode = null
+    }
+
+    if (this._silentGain) {
+      try {
+        this._silentGain.disconnect()
+      } catch (e) {}
+      this._silentGain = null
     }
 
     if (this.mediaStream) {
@@ -269,5 +267,3 @@ export class AudioWebSocketService {
     this.onAudioLevel(0)
   }
 }
-
-export { SAMPLE_VERSES_DB }
