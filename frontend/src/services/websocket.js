@@ -9,11 +9,11 @@ const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
 
 const API_BASE = isDev
   ? `http://${window.location.hostname}:9000`
-  : `${window.location.protocol}//${window.location.host}`
+  : `${window.location.protocol}//vers-b7g3.vercel.app`
 
 const WS_URL = isDev
   ? `ws://${window.location.hostname}:9000/ws/listen`
-  : `${wsProtocol}://${window.location.host}/ws/listen`
+  : `${wsProtocol}://vers-b7g3.vercel.app/ws/listen`
 
 export async function fetchSampleVerses(n = 6) {
   try {
