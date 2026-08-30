@@ -1,19 +1,34 @@
 <template>
   <header class="navbar-wrapper">
     <nav class="navbar-container">
-      <!-- Brand Logo with Combined Book & Microphone Emblem -->
-      <a href="/" class="brand-link" title="Vers — Shazam for Bible Verses">
+      <!-- Brand Logo: Bible with Microphone at top-right corner -->
+      <a href="/" class="brand-link" title="Vers — Scripture by Voice">
         <div class="brand-icon-wrapper">
-          <svg class="brand-icon" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Open Bible Base -->
-            <path d="M3 6.5C3 5.4 3.9 4.5 5 4.5H13V22.5H5C3.9 22.5 3 21.6 3 20.5V6.5Z" />
-            <path d="M25 6.5C25 5.4 24.1 4.5 23 4.5H15V22.5H23C24.1 22.5 25 21.6 25 20.5V6.5Z" />
-            <!-- Center Spine -->
-            <line x1="14" y1="4.5" x2="14" y2="22.5" />
-            <!-- Integrated Microphone Emblem in Center -->
-            <rect x="12" y="8" width="4" height="6.5" rx="2" fill="currentColor" />
-            <path d="M10 11.5a4 4 0 0 0 8 0" stroke-width="1.5" />
-            <line x1="14" y1="15.5" x2="14" y2="18" stroke-width="1.5" />
+          <svg class="brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Bible Book Body -->
+            <rect x="3.5" y="8" width="20" height="23" rx="3" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2" />
+            <!-- Book Spine / Edge Accent -->
+            <path d="M7 8V31" stroke="#1A1A1A" stroke-width="1.5" opacity="0.4" />
+            <!-- Book Spine Ribbon / Bookmark -->
+            <path d="M10 8V14L12 12.5L14 14V8" fill="#E4E4D0" stroke="#1A1A1A" stroke-width="1" />
+            <!-- Scripture Cross Symbol on Bible Cover -->
+            <path d="M12 19V26" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" />
+            <path d="M9 21.5H15" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" />
+            <!-- Pages Bottom Layer -->
+            <path d="M7 28H20" stroke="#1A1A1A" stroke-width="1.2" stroke-dasharray="1.5 2" opacity="0.35" />
+
+            <!-- Microphone Badge at Top-Right Corner -->
+            <g class="mic-badge-group">
+              <!-- Glow Aura & Circle Background -->
+              <circle cx="26" cy="10" r="8.5" fill="#F0D7FF" stroke="#1A1A1A" stroke-width="1.8" />
+              <!-- Microphone Capsule -->
+              <rect x="24.2" y="5.5" width="3.6" height="5.8" rx="1.8" fill="#1A1A1A" />
+              <!-- Microphone Pickup Arc -->
+              <path d="M22.5 8.8C22.5 10.7 24.1 12.2 26 12.2C27.9 12.2 29.5 10.7 29.5 8.8" stroke="#1A1A1A" stroke-width="1.4" stroke-linecap="round" />
+              <!-- Microphone Stem -->
+              <line x1="26" y1="12.2" x2="26" y2="14.2" stroke="#1A1A1A" stroke-width="1.4" stroke-linecap="round" />
+              <line x1="24.2" y1="14.2" x2="27.8" y2="14.2" stroke="#1A1A1A" stroke-width="1.4" stroke-linecap="round" />
+            </g>
           </svg>
         </div>
         <div class="brand-meta">
@@ -78,7 +93,7 @@ defineEmits(['open-architecture'])
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.55rem 1.1rem;
+  padding: 0.55rem 1.15rem;
   background: var(--color-surface-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -91,31 +106,33 @@ defineEmits(['open-architecture'])
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   text-decoration: none;
   color: var(--color-text-primary);
 }
 
 .brand-icon-wrapper {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-primary);
-  box-shadow: 0 2px 6px rgba(26, 26, 26, 0.06);
-  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 2px;
 }
 
 .brand-link:hover .brand-icon-wrapper {
-  transform: scale(1.06) rotate(-2deg);
+  transform: scale(1.08) rotate(-3deg);
+  background: #dadac2;
 }
 
 .brand-icon {
-  width: 21px;
-  height: 21px;
+  width: 32px;
+  height: 32px;
+  overflow: visible;
 }
 
 .brand-meta {
@@ -125,7 +142,7 @@ defineEmits(['open-architecture'])
 
 .brand-name {
   font-family: var(--font-heading);
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -139,7 +156,7 @@ defineEmits(['open-architecture'])
 }
 
 .nav-pill-btn {
-  padding: 0.45rem 1.05rem;
+  padding: 0.45rem 1.1rem;
   border-radius: var(--radius-pill);
   background: var(--color-accent);
   color: var(--color-text-primary);
@@ -156,8 +173,8 @@ defineEmits(['open-architecture'])
 }
 
 .nav-icon-link {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;

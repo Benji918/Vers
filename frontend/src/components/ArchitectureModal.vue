@@ -13,7 +13,7 @@
 
       <div class="modal-content">
         <p class="summary-lead">
-          <strong>"Shazam for Bible verses."</strong> Speak a verse aloud, and Vers identifies the exact book, chapter, and verse in real time — with no LLMs or vector embeddings involved in the matching.
+          <strong>"Shazam for Bible verses."</strong> Speak a verse aloud, and Vers identifies the exact book, chapter, and verse in real time, with no LLMs or vector embeddings involved in the matching.
         </p>
 
         <!-- Pipeline Steps with Bigger Readable Typography -->
