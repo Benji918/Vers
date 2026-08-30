@@ -6,23 +6,25 @@
     },
     "backend": {
       "root": "backend",
-      "framework": "fastapi",
-      "entrypoint": "app/main.py"
+      "framework": "fastapi"
+
     }
   },
   "rewrites": [
     {
-      "source": "/api(/.*)?",
+      "source": "/api/:path*",
       "destination": {
         "type": "service",
-        "service": "backend"
+        "service": "backend",
+        "path": "/api/:path*"
       }
     },
     {
-      "source": "/ws(/.*)?",
+      "source": "/ws/:path*",
       "destination": {
         "type": "service",
-        "service": "backend"
+        "service": "backend",
+        "path": "/ws/:path*"
       }
     },
     {
