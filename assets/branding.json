@@ -1,0 +1,163 @@
+{
+  "json": {
+    "company_name": "Wispr Flow",
+    "company_description": "A platform designed to enhance communication through voice dictation and note-taking tools."
+  },
+  "branding": {
+    "colorScheme": "light",
+    "fonts": [
+      {
+        "family": "Figtree",
+        "role": "body"
+      },
+      {
+        "family": "Eb Garamond",
+        "role": "heading"
+      }
+    ],
+    "colors": {
+      "primary": "#FFFFEB",
+      "secondary": "#F0D7FF",
+      "accent": "#E4E4D0",
+      "background": "#FFFFEB",
+      "textPrimary": "#1A1A1A",
+      "link": "#E4E4D0"
+    },
+    "typography": {
+      "fontFamilies": {
+        "primary": "Figtree",
+        "heading": "Eb Garamond"
+      },
+      "fontStacks": {
+        "heading": [
+          "Eb Garamond",
+          "Arial",
+          "sans-serif"
+        ],
+        "body": [
+          "Figtree",
+          "Arial",
+          "sans-serif"
+        ],
+        "paragraph": [
+          "Figtree",
+          "Arial",
+          "sans-serif"
+        ]
+      },
+      "fontSizes": {
+        "h1": "64px",
+        "h2": "64px",
+        "body": "16px"
+      }
+    },
+    "spacing": {
+      "baseUnit": 4,
+      "borderRadius": "16px"
+    },
+    "components": {
+      "buttonPrimary": {
+        "background": "#E4E4D0",
+        "textColor": "#1A1A1A",
+        "borderRadius": "1600px",
+        "borderRadiusCorners": {
+          "topLeft": "1600px",
+          "topRight": "1600px",
+          "bottomRight": "1600px",
+          "bottomLeft": "1600px"
+        },
+        "shadow": "none"
+      }
+    },
+    "images": {
+      "logo": "https://cdn.prod.website-files.com/682f84b3838c89f8ff7667db/683215c6f233131a07d8bafc_navbar_logo.svg",
+      "favicon": "https://cdn.prod.website-files.com/682f84b3838c89f8ff7667db/6a8406645defe8dfdb19c7f3_flow-favicon.png",
+      "ogImage": "https://cdn.prod.website-files.com/682fa12727f78b943ed45584/6a8293d31cc358c94781c5c2_mode-switching-tb.png",
+      "logoHref": "/",
+      "logoAlt": "Flow Logo"
+    },
+    "__llm_logo_reasoning": {
+      "selectedIndex": 0,
+      "reasoning": "Selected #0 because it is visible, located in the header, and links to the homepage, which are strong indicators of the main brand logo.",
+      "confidence": 0.9,
+      "source": "llm"
+    },
+    "__llm_button_reasoning": {
+      "primary": {
+        "index": 0,
+        "text": "Notetaker",
+        "reasoning": "Button #0 ('Notetaker') is selected as the primary CTA because it is the first button listed, and there is no distinction in color or style between the two buttons. In such cases, the first button is often the primary action."
+      },
+      "secondary": {
+        "index": 1,
+        "text": "Dictation",
+        "reasoning": "Button #1 ('Dictation') is selected as the secondary CTA because it is the second button listed, and there is no color distinction to differentiate primary from secondary."
+      },
+      "confidence": 0.6
+    },
+    "personality": {
+      "tone": "modern",
+      "energy": "medium",
+      "targetAudience": "tech-savvy professionals"
+    },
+    "designSystem": {
+      "framework": "custom",
+      "componentLibrary": ""
+    },
+    "confidence": {
+      "buttons": 0.6,
+      "colors": 0.8,
+      "overall": 0.7
+    },
+    "__llm_metadata": {
+      "logoSelection": {
+        "llmCalled": true,
+        "llmSucceeded": true,
+        "finalSource": "llm",
+        "rawLogoSelection": {
+          "selectedLogoIndex": 0,
+          "selectedLogoReasoning": "Selected #0 because it is visible, located in the header, and links to the homepage, which are strong indicators of the main brand logo.",
+          "confidence": 0.9
+        }
+      },
+      "buttonClassification": {
+        "llmCalled": true,
+        "llmSucceeded": true
+      }
+    },
+    "brandName": "Mode switching is obvious, but it’s not",
+    "logo": "https://cdn.prod.website-files.com/682f84b3838c89f8ff7667db/683215c6f233131a07d8bafc_navbar_logo.svg"
+  },
+  "metadata": {
+    "og:description": "Execution failures are mode switching gaps. Discover the 'open mode' for generating possibility and the 'close mode' for refining reality to improve your work.",
+    "language": "en",
+    "viewport": "width=device-width, initial-scale=1",
+    "google-site-verification": [
+      "nB5ZhzlaRY-zASqKlMYFlebzNc0mGhssolT9qcS3nms",
+      "P6GGpe_kog7Zac5lr_zc-Riq4UO4NNedDoVSLBu2-C4"
+    ],
+    "twitter:title": "Mode switching is obvious, but it’s not",
+    "description": "Execution failures are mode switching gaps. Discover the 'open mode' for generating possibility and the 'close mode' for refining reality to improve your work.",
+    "apple-itunes-app": "app-id=6497229487, app-argument=https://wisprflow.ai",
+    "ogTitle": "Mode switching is obvious, but it’s not",
+    "og:image": "https://cdn.prod.website-files.com/682fa12727f78b943ed45584/6a8293d31cc358c94781c5c2_mode-switching-tb.png",
+    "twitter:card": "summary_large_image",
+    "twitter:image": "https://cdn.prod.website-files.com/682fa12727f78b943ed45584/6a8293d31cc358c94781c5c2_mode-switching-tb.png",
+    "title": "Mode switching is obvious, but it’s not",
+    "ogDescription": "Execution failures are mode switching gaps. Discover the 'open mode' for generating possibility and the 'close mode' for refining reality to improve your work.",
+    "og:title": "Mode switching is obvious, but it’s not",
+    "ogImage": "https://cdn.prod.website-files.com/682fa12727f78b943ed45584/6a8293d31cc358c94781c5c2_mode-switching-tb.png",
+    "og:type": "website",
+    "twitter:description": "Execution failures are mode switching gaps. Discover the 'open mode' for generating possibility and the 'close mode' for refining reality to improve your work.",
+    "favicon": "https://cdn.prod.website-files.com/682f84b3838c89f8ff7667db/6a840664d12190f8ec4ab592_flow-favicon.png",
+    "scrapeId": "01a05034-93fa-728e-822d-19b5b7c80ed7",
+    "sourceURL": "https://wisprflow.ai/post/mode-switching",
+    "url": "https://wisprflow.ai/post/mode-switching",
+    "statusCode": 200,
+    "contentType": "text/html; charset=utf-8",
+    "timezone": "America/New_York",
+    "proxyUsed": "basic",
+    "indexId": "49beaa1d-0c11-487d-aab3-7f344b5d6bfa",
+    "creditsUsed": 5
+  }
+}
