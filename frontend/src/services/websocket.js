@@ -170,7 +170,11 @@ export class AudioWebSocketService {
   }
 
   _accumulateTranscript(text, isFinal) {
-    if (!text || !isFinal) return this.accumulatedText
+    // Deepgram sends smooth interim results during speech and a clean
+    // `speech_final` transcript after each pause (low endpointing). We append
+    // those clean finals to build the full passage, de-duplicating any shared
+    // boundary words between utterances so sentences join without repetition.
+    if (!text) return this.accumulatedText
     const cleaned = text.trim()
     if (!cleaned) return this.accumulatedText
 
@@ -181,13 +185,13 @@ export class AudioWebSocketService {
 
     const current = this.accumulatedText.replace(/\s+$/, '')
 
-    // Case 1: within-utterance cumulative growth — new text starts with what we have.
+    // Within-utterance cumulative growth — replace with the longer transcript.
     if (cleaned.startsWith(current)) {
       this.accumulatedText = cleaned
       return this.accumulatedText
     }
 
-    // Case 2: cross-utterance, the tail of current repeats at the head of cleaned.
+    // Cross-utterance: drop the shared tail/head so we don't repeat words.
     const overlap = this._overlapWords(current, cleaned)
     if (overlap >= 2) {
       const tail = cleaned.split(' ').slice(overlap).join(' ')
@@ -195,30 +199,37 @@ export class AudioWebSocketService {
       return this.accumulatedText
     }
 
-    // Case 3: distinct chunks, just concatenate.
+    // Distinct chunk — just concatenate.
     this.accumulatedText = `${current} ${cleaned}`
     return this.accumulatedText
   }
 
   _buildDisplayText(text, isFinal, accumulated) {
-    const base = (accumulated || '').trim()
-    if (isFinal || !text) return base
+    // Surface the full accumulated passage so prior sentences stay visible.
+    let base = (accumulated || '').trim()
 
-    // Live partial: show committed text plus the still-forming current words.
-    const partial = text.trim()
-    if (!partial) return base
+    // Also reflect the live words currently being spoken if they aren't yet in
+    // the accumulated passage (e.g. during an interim result mid-sentence).
+    const partial = (text || '').trim()
+    if (partial && !isFinal) {
+      base = this._mergePartial(base, partial)
+    }
+    return base
+  }
 
+  _mergePartial(base, partial) {
     const baseWords = base ? base.split(' ') : []
     const partialWords = partial.split(' ')
 
-    if (baseWords.length >= partialWords.length) {
-      const joined = baseWords.slice(0, partialWords.length).join(' ')
-      if (joined === partial) return base
+    if (base.endsWith(partial) || base === partial) return base
+
+    if (baseWords.length > 0 && partialWords.length > 0 && partial.includes(baseWords[0])) {
+      const overlap = this._overlapWords(base, partial)
+      const tail = partialWords.slice(overlap).join(' ')
+      return tail ? `${base} ${tail}` : base
     }
 
-    const overlap = this._overlapWords(base, partial)
-    const tail = partialWords.slice(overlap).join(' ')
-    return tail ? `${base ? base + ' ' : ''}${tail}` : base
+    return base ? `${base} ${partial}` : partial
   }
 
   _overlapWords(current, next) {

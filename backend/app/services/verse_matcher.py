@@ -10,12 +10,40 @@ logger = logging.getLogger("vers.matcher")
 MIN_SEGMENT_WORDS = 3
 CONFIDENCE_FLOOR = 0.35
 
+DIVINE_ALIASES = {
+    "yahweh": "lord",
+    "yehovah": "lord",
+    "jehovah": "lord",
+    "yhwh": "lord",
+    "yah": "lord",
+}
+
+def _normalize_divine_names(text: str) -> str:
+    """Treat divine-name variants (Yahweh/Jehovah/YHWH) as equivalent to Lord.
+
+    The WEB translation uses 'Yahweh' where spoken Bibles/transcripts commonly
+    say 'LORD', so we collapse these to one token so the matcher isn't tripped
+    up by translation vocabulary.
+    """
+    tokens = text.split()
+    out = []
+    for tok in tokens:
+        base = tok.strip(".,;:!?").lower()
+        replacement = DIVINE_ALIASES.get(base)
+        if replacement:
+            suffix = tok[len(base):] if base and tok.lower().startswith(base) else ""
+            out.append((replacement + suffix) if replacement else tok)
+        else:
+            out.append(tok)
+    return " ".join(out)
+
 def sanitize_transcript(text: str) -> str:
     """
     Strip FTS5 special characters, lowercase, collapse whitespace.
     """
     if not text:
         return ""
+    text = _normalize_divine_names(text)
     cleaned = re.sub(r'[\"\'\-\(\)\*\:\^\+\~\[\]\{\}\?\!\,\.\;\`]', ' ', text)
     cleaned = cleaned.lower()
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
@@ -54,7 +82,7 @@ def _score_candidates(sanitized: str, db_path: str, limit: int = 20) -> list:
         for cand in candidates:
             cand_id, book_id, chapter, verse, text, rank = cand
             cand_clean = sanitize_transcript(text or "")
-            score = fuzz.token_set_ratio(sanitized, cand_clean)
+            score = fuzz.partial_ratio(sanitized, cand_clean)
             scored.append({
                 "book": BOOK_NAMES.get(book_id, f"Book {book_id}"),
                 "chapter": chapter,
