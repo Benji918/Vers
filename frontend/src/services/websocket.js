@@ -45,7 +45,7 @@ export class AudioWebSocketService {
     this.onError = options.onError || (() => {})
     this.animationFrameId = null
     this.silenceTimer = null
-    this.autoStopMs = options.autoStopMs || 1500
+    this.autoStopMs = options.autoStopMs || 3000
     this._hadSpeech = false
     this.lastTranscript = ''
   }
