@@ -261,8 +261,8 @@ defineEmits(['close'])
   }
 
   .modal-card {
-    max-height: 75vh;
-    height: 75vh;
+    max-height: 85vh;
+    height: 85vh;
     border-radius: var(--radius-card);
     display: flex;
     flex-direction: column;
@@ -271,6 +271,7 @@ defineEmits(['close'])
   .modal-header {
     padding: 0.75rem 1rem 0.5rem;
     flex-shrink: 0;
+    text-align: center;
   }
 
   .eyebrow-badge {
@@ -293,18 +294,24 @@ defineEmits(['close'])
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .summary-lead {
     font-size: 0.85rem;
     line-height: 1.4;
     margin-bottom: 0.7rem;
+    text-align: center;
+    max-width: 95%;
   }
 
   .pipeline-grid {
     grid-template-columns: 1fr;
     gap: 0.45rem;
     margin-bottom: 0.6rem;
+    width: 100%;
   }
 
   .step-card {
@@ -330,6 +337,7 @@ defineEmits(['close'])
     padding: 0.55rem 0.7rem;
     gap: 0.35rem;
     margin-bottom: 0.6rem;
+    width: 100%;
   }
 
   .principle-title {
