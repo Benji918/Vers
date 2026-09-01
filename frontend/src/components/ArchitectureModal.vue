@@ -256,27 +256,30 @@ defineEmits(['close'])
 
 @media (max-width: 640px) {
   .modal-backdrop {
-    padding: 0.5rem;
-    align-items: center;
+    padding: 0;
+    align-items: stretch;
   }
 
   .modal-card {
-    max-height: 80vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    max-height: 75vh;
+    height: 75vh;
+    border-radius: var(--radius-card);
+    display: flex;
+    flex-direction: column;
   }
 
   .modal-header {
-    padding: 0.9rem 1rem 0.5rem;
+    padding: 0.75rem 1rem 0.5rem;
+    flex-shrink: 0;
   }
 
   .eyebrow-badge {
-    font-size: 0.65rem;
-    margin-bottom: 0.2rem;
+    font-size: 0.6rem;
+    margin-bottom: 0.15rem;
   }
 
   .modal-title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
   }
 
   .close-btn {
@@ -286,64 +289,68 @@ defineEmits(['close'])
   }
 
   .modal-content {
-    padding: 0 1rem 0.6rem;
+    padding: 0 1rem;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .summary-lead {
     font-size: 0.85rem;
-    line-height: 1.45;
-    margin-bottom: 0.8rem;
+    line-height: 1.4;
+    margin-bottom: 0.7rem;
   }
 
   .pipeline-grid {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.7rem;
+    gap: 0.45rem;
+    margin-bottom: 0.6rem;
   }
 
   .step-card {
-    padding: 0.65rem 0.8rem;
+    padding: 0.55rem 0.7rem;
   }
 
   .step-num {
-    font-size: 0.85rem;
-    margin-bottom: 0.1rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.05rem;
   }
 
   .step-title {
-    font-size: 0.82rem;
-    margin-bottom: 0.15rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.1rem;
   }
 
   .step-desc {
-    font-size: 0.75rem;
-    line-height: 1.35;
-  }
-
-  .principles-banner {
-    padding: 0.65rem 0.8rem;
-    gap: 0.4rem;
-  }
-
-  .principle-title {
-    font-size: 0.78rem;
-  }
-
-  .principle-desc {
-    font-size: 0.72rem;
+    font-size: 0.73rem;
     line-height: 1.3;
   }
 
+  .principles-banner {
+    padding: 0.55rem 0.7rem;
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .principle-title {
+    font-size: 0.75rem;
+  }
+
+  .principle-desc {
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
   .modal-footer {
-    padding: 0.5rem 1rem 0.9rem;
-    position: sticky;
-    bottom: 0;
+    padding: 0.6rem 1rem;
+    flex-shrink: 0;
+    border-top: 1px solid var(--color-border);
     background: #FFFFF4;
   }
 
   .primary-btn {
-    padding: 0.5rem 1.3rem;
-    font-size: 0.82rem;
+    padding: 0.55rem 1.5rem;
+    font-size: 0.85rem;
   }
 }
 </style>
