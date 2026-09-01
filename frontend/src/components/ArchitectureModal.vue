@@ -255,12 +255,95 @@ defineEmits(['close'])
 }
 
 @media (max-width: 640px) {
+  .modal-backdrop {
+    padding: 0.5rem;
+    align-items: center;
+  }
+
+  .modal-card {
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-header {
+    padding: 0.9rem 1rem 0.5rem;
+  }
+
+  .eyebrow-badge {
+    font-size: 0.65rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .modal-title {
+    font-size: 1.15rem;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .modal-content {
+    padding: 0 1rem 0.6rem;
+  }
+
+  .summary-lead {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 0.8rem;
+  }
+
   .pipeline-grid {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
   }
-  .modal-header, .modal-content, .modal-footer {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+
+  .step-card {
+    padding: 0.65rem 0.8rem;
+  }
+
+  .step-num {
+    font-size: 0.85rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .step-title {
+    font-size: 0.82rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .step-desc {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .principles-banner {
+    padding: 0.65rem 0.8rem;
+    gap: 0.4rem;
+  }
+
+  .principle-title {
+    font-size: 0.78rem;
+  }
+
+  .principle-desc {
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  .modal-footer {
+    padding: 0.5rem 1rem 0.9rem;
+    position: sticky;
+    bottom: 0;
+    background: #FFFFF4;
+  }
+
+  .primary-btn {
+    padding: 0.5rem 1.3rem;
+    font-size: 0.82rem;
   }
 }
 </style>
